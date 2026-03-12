@@ -1,95 +1,145 @@
-# iFinD (同花顺 HTTP API) 模块使用说明
+# iFinD (同花顺 HTTP API) DolphinDB 模块使用说明
 
-## 模块介绍
+## 1. 模块介绍
 
-在进行金融量化分析时，获取实时打点与盘后复权数据是第一步。`ifind` 模块对接了同花顺数据终端的 iFinD HTTP API 接口，将其丰富的数据网关无缝集成到 DolphinDB 中。用户不再需要编写 C++ 插件、Python 进程或者维护跨平台环境，只要通过这个原生脚本模块即可调用任何复杂的 iFinD 高阶数据，并将回传的 JSON 数据直接展开为结构化的 DolphinDB 数据表 (`Table`)。
+`ifind` 模块是对同花顺 iFinD HTTP API 的深度封装，旨在为 DolphinDB 用户提供原生、高速、稳定的金融数据接入方案。通过该模块，用户可以在 DolphinDB 脚本中直接获取 A 股、港股、美股、基金、债券、指数等全品种行情及各种财务、估值指标，并自动解析为结构化的 `Table` 对象，极大地简化了量化研究的数据预处理流程。
 
-## 第三方插件依赖
+---
 
-本模块利用了 DolphinDB 自带的高性能网络插件作为引擎：
-- `httpClient` 插件：用于发起 HTTP POST 请求与同花顺 API 鉴权服务器通信并极速获取数据报文。
+## 2. 快速开始
 
-**前置操作：**
-请确保在使用前在集群或本地加载了网络通信组件：
+### 2.1 依赖安装
+本模块依赖 DolphinDB 内置的 `httpClient` 网络插件：
 ```dolphindb
-installPlugin("httpClient");
-loadPlugin("httpClient");
-```
-
-## 前期准备（获取免密码 Token）
-
-iFinD HTTP 模块强制要求用户不能在脚本里面暴露账号密码。请按照以下步骤生成永久通行证：
-1. 账号准备：拥有一套带量化 API (EmQuant / HTTP) 权限的同花顺终端账号（或申请的子账号）。
-2. 获取 `refresh_token`：
-   - 使用 Windows 上安装好的《iFinD 超级命令》客户端。
-   - 使用账号密码登录后，点击顶部工具栏 **工具 -> refresh_token查询/更新**。
-   - 提取出属于您的超级长效刷新密钥，这个 `refresh_token` 的寿命与账号期限等长。
-   
-## 接口介绍
-
-模块将所有最核心的功能封装为统一的调用接口。
-
-### getApiData
-
-**语法**
-```dolphindb
-ifind::getApiData(refreshToken, apiName, params=NULL, columns=[])
-```
-
-#### 详情
-通用的网关执行槽。不仅会自动帮您判断 Access Token 的期限去置换新的 Token，还会全量打包和发送数据，处理 iFinD 底层的 `"tables"` 多证券混合包。
-
-#### 参数
-- **refreshToken**: 字符串。提取出来的同花顺账号刷新口令。
-- **apiName**: 字符串。您要获取的接口路由端点，同花顺支持以下主要后缀：
-  - `"basic_data_service"`: 基础数据
-  - `"date_sequence"`: 日期序列
-  - `"cmd_history_quotation"`: 历史行情
-  - `"high_frequency"`: 高频序列、日内分时
-  - `"real_time_quotation"`: 实时行情快照
-- **params**: 字典(`DICTIONARY`)。按照 iFinD 说明手册中指定的查询规范（例如 `codes`, `indicators`, `startdate`）。
-- **columns**: 字符串数组。在返回的 Table 中精确提取需要的列。
-
-#### 示例：获取历史周线下发数据
-
-```dolphindb
-loadPlugin("httpClient")
+try { loadPlugin("httpClient") } catch(ex) {}
 use ifind
-
-// 1. 设置长效通行证
-refreshToken = "eyJzaWduX3RpbWUiOiIy...填充您的长效凭据..." 
-
-// 2. 组装查询参数
-api = "cmd_history_quotation"
-p = dict(STRING, ANY)
-p["codes"] = "300033.SZ,600030.SH"
-p["indicators"] = "open,close,volume"
-p["startdate"] = "20230101"
-p["enddate"] = "20231231"
-
-funcPara = dict(STRING, STRING)
-funcPara["Interval"] = "W" // 周线
-funcPara["CPS"] = "1"      // 不复权
-p["functionpara"] = funcPara
-
-// 3. 通信与解析 (返回的是标准 DolphinDB Table)
-resultTb = ifind::getApiData(refreshToken, api, p)
-
-select * from resultTb where thscode="300033.SZ"
 ```
 
-## 后期计划与已知限制 (Roadmap & Limitations)
+### 2.2 凭证准备 (Refresh Token)
+1.  登录同花顺 iFinD 终端。
+2.  点击 **工具 -> refresh_token 查询/更新**。
+3.  获取属于您的长效 `refresh_token`（建议在 DolphinDB 中使用单引号 `'...'` 包裹）。
 
-### 1. 中文编码适配 (Unicode Decoding)
-目前模块在解析包含中文的 JSON 时（如 `THS_BD` 基础数据接口），由于 DolphinDB 原生 `parseExpr` 的限制，中文字符可能会显示为 `uXXXX` 格式（如 `u8D35u5DDEu8305u53F0`）。
+---
 
-*   **推荐方案**: 手动安装 DolphinDB 官方的 `json` 插件（`installPlugin("json")`），并使用 `fromJson` 替代脚本逻辑。
-*   **高阶方案**: `EncoderDecoder` 插件可基于规则高效解析 JSON。
-    *   **限制**: `EncoderDecoder` 插件目前仅支持 **Linux x86-64** 和 **Linux ARM**。由于当前 iFinD 客户端环境常处于 Windows，该插件暂不可用。
-*   **计划**: 未来将在 Linux 计算节点上引入自动探测逻辑，优先利用高性能插件处理中文转码。
+## 3. 核心 API 参考 (API Reference)
 
-### 2. 多标的并行化
-目前 `getApiData` 处理大批量证券代码时是串行发送。计划引入 `pli` 或异步任务队列，支持在 DolphinDB Server 端并发请求多个证券的历史序列，进一步提升万级标的的拉取效率。
+### 3.1 基础数据接口 (THS_BD)
+获取证券的基础资料、实时快照或特定日期的指标值。
 
-### 3. 数据类型自动转换
-目前接口透传同花顺原始数据类型（多为 `DOUBLE` 或 `ANY`）。未来计划根据 `datatype` 字段映射，自动将日期字符串、布尔值等转换为 DolphinDB 原生日期类型 (`DATE`, `DATETIME`)。
+**语法**: `ifind::THS_BD(token, codes, indicators, [indipara])`
+- **参数**:
+    - `token`: `refreshToken` (自动登录) 或 `accessToken` (高效复用)。
+    - `codes`: 证券代码。支持 `STRING` (如 `"600519.SH"`) 或 `STRING VECTOR` (如 `["600519.SH", "000001.SZ"]`)。
+    - `indicators`: 指标名称。多个指标用逗号分隔，如 `"ths_stock_short_name_stock,ths_open_price_stock"`。
+    - `indipara`: **(可选)** 指标参数。如 `"date:20231231;type:1"`。
+- **示例**: `ifind::THS_BD(token, "600519.SH", "ths_stock_short_name_stock")`
+- **返回值示例**:
+| ths_code | ths_stock_short_name_stock |
+| :--- | :--- |
+| 600519.SH | 贵州茅台 |
+
+### 3.2 日期序列接口 (THS_DS)
+获取历史财务数据、估值指标等具有时间序列特征的数据。
+
+**语法**: `ifind::THS_DS(token, codes, indicators, indipara, functionpara, startdate, enddate)`
+- **参数**:
+    - `token/codes/indicators`: 同上。
+    - `indipara`: 指标特定参数，通常传空字符串 `""` 即可。
+    - `functionpara`: 功能参数。控制周期和填充方式，如 `"Interval:D,Days:Tradedays"`。
+    - `startdate`: 开始日期。支持 `"YYYY-MM-DD"`。
+    - `enddate`: 结束日期。支持 `"YYYY-MM-DD"`。
+- **示例**: `ifind::THS_DS(token, "600519.SH", "ths_pe_ttm_stock", "", "", "2024-01-01", "2024-01-03")`
+- **返回值示例**:
+| ths_code | time | ths_pe_ttm_stock |
+| :--- | :--- | :--- |
+| 600519.SH | 2024-01-02 | 30.25 |
+| 600519.SH | 2024-01-03 | 29.88 |
+
+### 3.3 历史行情接口 (THS_HQ)
+获取标准的历史日/周/月 K 线行情（OHLCV）。
+
+**语法**: `ifind::THS_HQ(token, codes, indicators, functionpara, startdate, enddate)`
+- **参数**:
+    - `indicators`: 常用指标如 `"open,high,low,close,volume,amount"`。
+    - `functionpara`: 控制复权和周期。如 `"Interval:D,CPS:2,Fill:Original"` (CPS:2 为前复权)。
+    - `startdate/enddate`: 历史行情起止日期。
+- **示例**: `ifind::THS_HQ(token, "600519.SH", "open,close", "Interval:D", "2024-01-01", "2024-01-03")`
+- **返回值示例**:
+| ths_code | time | open | close |
+| :--- | :--- | :--- | :--- |
+| 600519.SH | 2024-01-02 | 1700.0 | 1720.5 |
+| 600519.SH | 2024-01-03 | 1721.0 | 1715.0 |
+
+### 3.4 高频序列接口 (THS_HF)
+获取日内高频 K 线数据（如 1 分钟线、5 分钟线）。
+
+**语法**: `ifind::THS_HF(token, codes, indicators, functionpara, starttime, endtime)`
+- **参数**:
+    - `starttime`: 开始时间。格式 `"YYYY-MM-DD HH:mm:ss"`。
+    - `endtime`: 结束时间。格式 `"YYYY-MM-DD HH:mm:ss"`。
+    - `functionpara`: 常用周期 `"Interval:1"`。
+- **示例**: `ifind::THS_HF(token, "600519.SH", "close", "Interval:1", "2024-03-11 09:30:00", "2024-03-11 09:32:00")`
+- **返回值示例**:
+| ths_code | time | close |
+| :--- | :--- | :--- |
+| 600519.SH | 2024-03-11 09:31:00 | 1705.5 |
+| 600519.SH | 2024-03-11 09:32:00 | 1706.2 |
+
+### 3.5 实时行情接口 (THS_RQ)
+获取最实时的盘中指标快照。
+
+**语法**: `ifind::THS_RQ(token, codes, indicators)`
+- **参数**:
+    - `indicators`: 常用 `"latest,changeRatio,bid1,ask1"`。
+- **示例**: `ifind::THS_RQ(token, "600519.SH", "latest,changeRatio")`
+- **返回值示例**:
+| ths_code | latest | changeRatio |
+| :--- | :--- | :--- |
+| 600519.SH | 1710.2 | 0.45 |
+
+---
+
+## 4. 管理与辅助函数
+
+### 4.1 模块信息 (module_info)
+查询当前安装的模块版本及元数据。
+- **调用**: `ifind::module_info()`
+
+### 4.2 认证登录 (getAccessToken)
+使用 `refreshToken` 获取短期有效的 `accessToken`。
+- **语法**: `accToken = ifind::getAccessToken(refreshToken)`
+
+### 4.3 底层调用 (getApiData)
+直接向底层 API 发送请求（常用于调用暂未封装的特殊接口）。
+- **语法**: `ifind::getApiData(token, apiName, params)`
+
+---
+
+## 5. 参数字典常用配置
+
+| 参数类 (Key) | 说明 | 可选值 (Value) |
+| :--- | :--- | :--- |
+| **Interval** | 周期 | `D` (日), `W` (周), `M` (月), `1` (1分钟), `5` (5分钟) |
+| **Days** | 日历模式 | `Tradedays` (交易日), `Alldays` (自然日) |
+| **Fill** | 填充逻辑 | `Previous` (向前填充), `Blank` (空值), `Original` (原始) |
+| **CPS** | 复权逻辑 | `1` (不复权), `2` (前复权), `3` (后复权) |
+
+---
+
+## 6. 参数校验与错误排查
+
+从 **v1.0.8** 开始，模块引入了强类型校验：
+- **数据类型错误**: 若将 `codes` 传为数字而非字符串，将抛出 `codes must be a STRING or STRING VECTOR`。
+- **空值拦截**: `NULL` 值入口会被自动拦截并显示具体参数名。
+- **认证错误**:
+    - `HTTP 401`: Token 损坏或已失效。
+    - `-1301`: Refresh Token 填写错误。
+
+---
+
+## 7. 性能优化建议 (Best Practices)
+
+1.  **Token 复用**：在一个长脚本或循环中，先调用 `getAccessToken` 获得临时 Token，并将其传入后续业务接口。这可以避免每次调用都要请求鉴权服务器，性能提升显著。
+2.  **批量请求**：`codes` 参数支持向量。一次请求 50 只股票的性能远高于由于 50 次单请求。
+3.  **并发执行**：本模块在 DolphinDB 环境下是线程安全的，可通过 `submitJob` 并发加载不同品种的数据。

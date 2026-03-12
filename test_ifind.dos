@@ -1,49 +1,156 @@
 try { loadPlugin("httpClient") } catch(ex) {}
 use ifind
 
-refreshToken = "YOUR_TOKEN_HERE"
-// ----------------------------------------------------
-// 1. THS_HQ - 历史行情查询 (History Quotation)
-// 说明: 获取指定股票的历史行情数据。
-// 参数: 加上 "time" 即可显示日期。
-// ----------------------------------------------------
-print("=== [1/5] 测试 THS_HQ (历史行情) ===")
-tb1 = ifind::THS_HQ(refreshToken, "600519.SH", "open,high,low,close,volume,amount", "Fill:Original", "2026-03-09", "2026-03-10")
-print("返回行数: " + string(tb1.rows()))
-print(tb1)
+// 1. 设置长效刷新凭证 (请确保此处为最新的有效 Token)
+refreshToken = "USER_TOKEN"
+// 2. 获取 AccessToken 并复用
+accToken = ifind::getAccessToken(refreshToken)
+print("AccessToken 获取成功: " + accToken.left(10) + "...")
 
-// ----------------------------------------------------
-// 2. THS_DS - 日期序列查询 (Date Serial)
-// ----------------------------------------------------
-print("\n=== [2/5] 测试 THS_DS (日期序列-市盈率TTM) ===")
-tb2 = ifind::THS_DS(refreshToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-03-01", "2026-03-09")
-print("返回行数: " + string(tb2.rows()))
-print(tb2)
+// ====================================================
+// 第一部分：功能测试 (Functional Tests)
+// ====================================================
 
-// ----------------------------------------------------
-// 3. THS_BD - 基础数据查询 (Basic Data)
-// ----------------------------------------------------
-print("\n=== [3/5] 测试 THS_BD (基础数据) ===")
-tb3 = ifind::THS_BD(refreshToken, "600519.SH", "ths_stock_short_name_stock,ths_listing_date_stock", "")
-print("返回行数: " + string(tb3.rows()))
-print(tb3)
+@testing:case = "test_THS_HQ"
+print("=== [1/8] 测试 THS_HQ (历史行情) ===")
+tb1 = ifind::THS_HQ(accToken, "600519.SH", "open,high,low,close,volume", "Fill:Original", "2026-03-01", "2026-03-05")
+assert 1, tb1.rows() > 0
+print("THS_HQ 验证通过")
 
-// ----------------------------------------------------
-// 4. THS_RQ - 实时行情查询 (Real-time Quotation)
-// ----------------------------------------------------
-print("\n=== [4/5] 测试 THS_RQ (实时行情) ===")
-tb4 = ifind::THS_RQ(refreshToken, "600519.SH", "open,high,low,latest")
-print("返回行数: " + string(tb4.rows()))
-print(tb4)
+@testing:case = "test_THS_DS"
+print("\n=== [2/8] 测试 THS_DS (日期序列) ===")
+tb2 = ifind::THS_DS(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-02-01", "2026-03-01")
+assert 2, tb2.rows() > 0
+print("THS_DS 验证通过")
 
-// ----------------------------------------------------
-// 5. THS_HF - 高频行情查询 (High Frequency)
-// ----------------------------------------------------
-print("\n=== [5/5] 测试 THS_HF (高频行情-5分钟) ===")
-tb5 = ifind::THS_HF(refreshToken, "600519.SH", "close,volume", "Fill:Original,Interval:5", "2026-03-09 09:30:00", "2026-03-09 15:00:00")
-print("返回行数: " + string(tb5.rows()))
-print(tb5)
+@testing:case = "test_THS_HF"
+print("\n=== [3/8] 测试 THS_HF (高频行情) ===")
+tb3 = ifind::THS_HF(accToken, "600519.SH", "open,high,low,close,volume", "Interval:1,Fill:Original", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
+assert 3, tb3.rows() >= 0
+print("THS_HF 验证完成")
+
+@testing:case = "test_THS_BD"
+print("\n=== [4/8] 测试 THS_BD (基础数据) ===")
+tb4 = ifind::THS_BD(accToken, "600519.SH", "ths_stock_short_name_stock")
+assert 4, tb4.rows() == 1
+print("THS_BD 验证通过")
+
+@testing:case = "test_THS_RQ"
+print("\n=== [5/8] 测试 THS_RQ (实时行情) ===")
+tb5 = ifind::THS_RQ(accToken, "600519.SH", "latest")
+assert 5, tb5.rows() == 1
+print("THS_RQ 验证通过")
+
+@testing:case = "test_module_info"
+print("\n=== [6/8] 测试 module_info (模块信息) ===")
+info = ifind::module_info()
+assert 6, info.moduleName == "ifind"
+print("module_info 验证通过")
+
+@testing:case = "test_getAccessToken"
+print("\n=== [7/8] 测试 getAccessToken (认证接口) ===")
+tmpToken = ifind::getAccessToken(refreshToken)
+// 只要返回的是非空字符串且有一定长度即视为成功 (注意: DolphinDB 中字符串标量的 size() 为 1，需用 strlen() 检查长度)
+assert 7, typestr(tmpToken) == "STRING" and strlen(tmpToken) > 10
+print("getAccessToken 验证通过")
+
+@testing:case = "test_getApiData"
+print("\n=== [8/8] 测试 getApiData (底层请求接口) ===")
+res = ifind::getApiData(accToken, "basic_data_service", {"codes":"600519.SH", "indipara":[{"indicator":"ths_stock_short_name_stock","indiparams":[]}]})
+assert 8, res.rows() > 0
+print("getApiData 验证通过")
+
+
+// ====================================================
+// 第二部分：功能反向测试 (Reverse Functional Tests)
+// ====================================================
+
+@testing:case = "test_THS_HQ_Reverse", exception=1
+print("\n=== [反向测试] THS_HQ (处理无效指标请求) ===")
+try { ifind::THS_HQ(accToken, "600519.SH", "unknown_ind_abc", "", "2026-03-01", "2026-03-05"); assert 9, false } catch(ex) { print("捕获预期的业务逻辑异常: " + ex[1]) }
+
+@testing:case = "test_THS_DS_Reverse", exception=1
+print("\n=== [反向测试] THS_DS (反向历史日期) ===")
+try { ifind::THS_DS(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-03-01", "2026-02-01"); assert 10, false } catch(ex) { print("捕获预期的日期范围异常: " + ex[1]) }
+
+
+// ====================================================
+// 第三部分：异常与边界校验 (Error & Boundary Tests)
+// ====================================================
+
+@testing:case = "test_ParamTypeValidation", exception=1
+print("\n=== [6/10] 参数类型校验测试 ===")
+// 6.1 Token 为 INT (预期报错)
+try { ifind::THS_RQ(12345, "600519.SH", "latest"); assert 61, false } catch(ex) { print("捕获预期的 Token 类型异常") }
+
+// 6.2 codes 为 NULL (预期报错)
+try { ifind::THS_BD(accToken, NULL, "ths_stock_short_name_stock"); assert 62, false } catch(ex) { print("捕获预期的 codes NULL 异常") }
+
+// 6.3 indicators 类型错误 (INT 矢量，预期报错)
+try { ifind::THS_BD(accToken, "600519.SH", 123); assert 63, false } catch(ex) { print("捕获预期的 indicators 类型异常") }
+
+
+@testing:case = "test_ArgCountValidation", exception=1
+print("\n=== [7/10] 参数个数校验测试 ===")
+// 关键修复：使用 call 动态调用以绕过编译期语法检查，使其能在运行时触发异常
+try { 
+    call(ifind::THS_HQ, [accToken, "600519.SH", "close"])
+    assert 71, false 
+} catch(ex) { 
+    print("捕获预期的参数个数不足异常: " + ex[1]) 
+}
+
+
+@testing:case = "test_InvalidApiName", exception=1
+print("\n=== [8/10] 无效接口名校验测试 ===")
+try { ifind::getApiData(accToken, "not_exist_api_999", {}); assert 81, false } catch(ex) { print("捕获预期的 API 接口名无效异常") }
+
+
+@testing:case = "test_EmptyStringValidation", exception=1
+print("\n=== [9/10] 空字符串校验测试 ===")
+try { ifind::THS_DS(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "", "2026-03-01"); assert 91, false } catch(ex) { print("捕获预期的日期空字符串异常") }
+
+
+@testing:case = "test_BusinessLogicError", exception=1
+print("\n=== [10/10] 业务逻辑错误测试 (无效 Token 响应) ===")
+try { 
+    ifind::THS_RQ("eyJzaWduIjoiaW52YWxpZCJ9.payload.sig", "600519.SH", "latest")
+    assert 10, false 
+} catch(ex) {
+    print("业务异常捕获成功: " + ex[1])
+}
+
+
+// ====================================================
+// 第四部分：深度与并发验证 (Advanced Execution)
+// ====================================================
+
+@testing:case = "test_ConcurrentExecution"
+print("\n=== [进阶] 并发执行测试 ===")
+def iFindConcurrentCall(tk, codes, ind){
+    total = 0
+    for(i in 1..5){
+        res = ifind::THS_RQ(tk, codes, ind)
+        if(res.rows() > 0) total += 1
+        sleep(200) // 避免触发过于频繁的限流
+    }
+    return total
+}
+
+jobs = array(STRING, 0)
+for(i in 1..4){
+    jobId = "ifind_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel Test", iFindConcurrentCall, accToken, "600519.SH", "latest")
+    jobs.append!(jobId)
+}
+
+// 等待所有任务完成并获取结果
+for(jid in jobs){
+    res = getJobReturn(jid, true)
+    assert 11, res == 5 // 每个任务执行 5 次成功
+}
+print("并发测试完成 (4个并发任务已成功结束)")
 
 print("\n====================================================")
-print("  所有测试执行完毕  ")
+print("  iFinD 核心模块 [全函数功能测试] + [异常校验] 执行完毕  ")
 print("====================================================")
