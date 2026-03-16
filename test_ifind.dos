@@ -2,155 +2,600 @@ try { loadPlugin("httpClient") } catch(ex) {}
 use ifind
 
 // 1. 设置长效刷新凭证 (请确保此处为最新的有效 Token)
-refreshToken = "USER_TOKEN"
+refreshToken = "eyJzaWduX3RpbWUiOiIyMDI2LTAyLTA4IDIyOjU1OjExIn0=.eyJ1aWQiOiI2MjIzNTAzNjQiLCJ1c2VyIjp7ImFjY2Vzc1Rva2VuIjoiNTQ1YWY4NjM0NDA3MDY0MTVhM2FhM2Y4OThmZjI4MzI4MjYzMDY0My5zaWduc19Oakl5TXpVd016WTAiLCJhY2Nlc3NUb2tlbkV4cGlyZWRUaW1lIjoiMjAyNi0wMi0wOCAyMjo1NToxMSIsImFjY291bnQiOiJoYXpxOTEyIiwiYXV0aFVzZXJJbmZvIjp7IkVDSUNDIjp0cnVlLCJTRlRTRSI6dHJ1ZSwiU1VTQUluZGV4Q29kZSI6dHJ1ZSwiU0NJQ0MiOnRydWUsIkVGVFNFIjp0cnVlLCJvdmVyU2VhIjpmYWxzZSwiYXBpRm9ybWFsIjoiMSIsIlNEQ0UiOnRydWUsIkVUcmFuc2ZlciI6dHJ1ZSwiU0xNRSI6dHJ1ZSwiY3NpIjp0cnVlLCJERUxBWV9DSUNDIjpmYWxzZSwiRUxNRSI6dHJ1ZX0sImNvZGVDU0kiOltdLCJjb2RlWnpBdXRoIjpbIjExIiwiMjIiLCIxMiIsIjI1IiwiMTUiLCIyNiIsIjE2IiwiMTciLCIxOCIsIjE5IiwiMSIsIjIiLCIzIiwiNCIsIjUiLCI2IiwiNyIsIjgiLCI5IiwiMjAiLCIxMCIsIjIxIl0sImhhc0FJUHJlZGljdCI6ZmFsc2UsImhhc0FJVGFsayI6ZmFsc2UsImhhc0NJQ0MiOnRydWUsImhhc0NTSSI6dHJ1ZSwiaGFzRXZlbnREcml2ZSI6ZmFsc2UsImhhc0ZUU0UiOnRydWUsImhhc0Zhc3QiOmZhbHNlLCJoYXNGdW5kVmFsdWF0aW9uIjpmYWxzZSwiaGFzSEsiOnRydWUsImhhc0xNRSI6dHJ1ZSwiaGFzTGV2ZWwyIjpmYWxzZSwiaGFzUmVhbENNRSI6ZmFsc2UsImhhc1RyYW5zZmVyIjpmYWxzZSwiaGFzVVMiOmZhbHNlLCJoYXNVU0FJbmRleCI6dHJ1ZSwiaGFzVVNERUJUIjpmYWxzZSwibWFya2V0QXV0aCI6eyJEQ0UiOmZhbHNlfSwibWFya2V0Q29kZSI6IjE2OzMyOzE0NDsxNzY7MTEyOzg4OzQ4OzEyODsxNjgtMTsxODQ7MjAwOzIxNjsxMDQ7MTIwOzEzNjsyMzI7NTY7OTY7MTYwOzY0OyIsIm1heE9uTGluZSI6MSwibm9EaXNrIjpmYWxzZSwicHJvZHVjdFR5cGUiOiJTVVBFUkNPTU1BTkRQUk9EVUNUIiwicmVmcmVzaFRva2VuRXhwaXJlZFRpbWUiOiIyMDI2LTA5LTA0IDEwOjQwOjAyIiwic2Vzc3Npb24iOiJhYjhmZTI2Y2I5ZGVkOTA3OGU5N2IyNzBiZWFmYTIxZiIsInNpZEluZm8iOns2NDoiMTExMTExMTExMTExMTExMTExMTExMTExIiwxOiIxMDEiLDI6IjEiLDY3OiIxMDExMTExMTExMTExMTExMTExMTExMTEiLDM6IjEiLDY5OiIxMTExMTExMTExMTExMTExMTExMTExMTExIiw1OiIxIiw2OiIxIiw3MToiMTExMTExMTExMTExMTExMTExMTExMTAwIiw3OiIxMTExMTExMTExMSIsODoiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEiLDEzODoiMTExMTExMTExMTExMTExMTExMTExMTExMSIsMTM5OiIxMTExMTExMTExMTExMTExMTExMTExMTExIiwxNDA6IjExMTExMTExMTExMTExMTExMTExMTExMTEiLDE0MToiMTExMTExMTExMTExMTExMTExMTExMTExMSIsMTQyOiIxMTExMTExMTExMTExMTExMTExMTExMTExIiwxNDM6IjExIiw4MDoiMTExMTExMTExMTExMTExMTExMTExMTExIiw4MToiMTExMTExMTExMTExMTExMTExMTExMTExIiw4MjoiMTExMTExMTExMTExMTExMTExMTEwMTEwIiw4MzoiMTExMTExMTExMTExMTExMTExMDAwMDAwIiw4NToiMDExMTExMTExMTExMTExMTExMTExMTExIiw4NzoiMTExMTExMTEwMDExMTExMDExMTExMTExIiw4OToiMTExMTExMTEwMTEwMTExMTExMTAxMTExIiw5MDoiMTExMTEwMTExMTExMTExMTExMTExMTExMTAiLDkzOiIxMTExMTExMTExMTExMTExMTAwMDAxMTExIiw5NDoiMTExMTExMTExMTExMTExMTExMTExMTExMSIsOTY6IjExMTExMTExMTExMTExMTExMTExMTExMTEiLDk5OiIxMDAiLDEwMDoiMTExMTAxMTExMTExMTExMTExMCIsMTAyOiIxIiw0NDoiMTEiLDEwOToiMSIsNTM6IjExMTExMTExMTExMTExMTExMTExMTExMSIsNTQ6IjExMDAwMDAwMDAxMTAwMDAwMTAxMDAwMDAxMDAxMDAwMDAwIiw1NzoiMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAiLDYyOiIxMTExMTExMTExMTExMTExMTExMTExMTEiLDYzOiIxMTExMTExMTExMTExMTExMTExMTExMTEifSwidGltZXN0YW1wIjoiMTc3MDU2MjUxMTMxNSIsInRyYW5zQXV0aCI6ZmFsc2UsInR0bFZhbHVlIjowLCJ1aWQiOiI2MjIzNTAzNjQiLCJ1c2VyVHlwZSI6Ik9GRklDSUFMIiwid2lmaW5kTGltaXRNYXAiOnt9fX0=.AF701CE4B99929CE20C5571F9AB7EA3A52BBEB59C579CF27FA268D6531894CD4"
+
 // 2. 获取 AccessToken 并复用
 accToken = ifind::getAccessToken(refreshToken)
 print("AccessToken 获取成功: " + accToken.left(10) + "...")
+
+@testing:case = "test_module_info"
+print("\n=== 测试 module_info (模块信息) ===")
+info = getLoadedModules()
+assert 0, info.moduleName == "ifind"
+print("module_info 验证通过")
 
 // ====================================================
 // 第一部分：功能测试 (Functional Tests)
 // ====================================================
 
-@testing:case = "test_THS_HQ"
-print("=== [1/8] 测试 THS_HQ (历史行情) ===")
-tb1 = ifind::THS_HQ(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Fill:Original", "2026-03-01", "2026-03-05")
-assert 1, tb1.rows() > 0
-print("THS_HQ 验证通过")
+// --- 1.1 thsBasicData (基础快照数据) ---
+@testing:case = "test_thsBasicData_Rich"
+print("\n=== 测试 thsBasicData (基础数据) ===")
 
-@testing:case = "test_THS_DS"
-print("\n=== [2/8] 测试 THS_DS (日期序列) ===")
-tb2 = ifind::THS_DS(accToken, "600519.SH,600518.SH", "ths_pe_ttm_stock,ths_pb_latest_stock,ths_turnover_ratio_stock,ths_amt_stock", "100;100;;", "", "2026-02-01", "2026-03-01")
-assert 2, tb2.rows() > 0
-print("THS_DS 验证通过")
+// 1. token 类型: 分别使用 accessToken 和 refreshToken
+res1_1_acc = ifind::thsBasicData(accToken, "600519.SH", "ths_stock_short_name_stock")
+res1_1_ref = ifind::thsBasicData(refreshToken, "600519.SH", "ths_stock_short_name_stock")
 
-@testing:case = "test_THS_HF"
-print("\n=== [3/8] 测试 THS_HF (高频行情) ===")
-tb3 = ifind::THS_HF(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Interval:1,Fill:Original", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
-assert 3, tb3.rows() >= 0
-print("THS_HF 验证完成")
+// 2. codes 多标的输入
+res1_2_codes = ifind::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock")
 
-@testing:case = "test_THS_BD"
-print("\n=== [4/8] 测试 THS_BD (基础数据) ===")
-tb4 = ifind::THS_BD(accToken, "600519.SH,600518.SH", "ths_stock_short_name_stock")
-assert 4, tb4.rows() == 2
-print("THS_BD 验证通过")
+// 3. 多指标 + 指标参数 (分号分隔不同指标的参数)
+res1_3 = ifind::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_stock", ";2023-12-31")
+res1_4 = ifind::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_stock,ths_roe_avg_by_ths_stock", ";2022-12-31;2023-12-31")
 
-@testing:case = "test_THS_RQ"
-print("\n=== [5/8] 测试 THS_RQ (实时行情) ===")
-tb5 = ifind::THS_RQ(accToken, "600519.SH,600518.SH", "latest")
-assert 5, tb5.rows() == 2
-print("THS_RQ 验证通过")
+// 4. 大写指标自动转小写 (模块内部调用 lower() 纠正)
+res1_5 = ifind::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_STOCK", ";2023-12-31")
 
-@testing:case = "test_module_info"
-print("\n=== [6/8] 测试 module_info (模块信息) ===")
-info = ifind::module_info()
-assert 6, info.moduleName == "ifind"
-print("module_info 验证通过")
-
-@testing:case = "test_getAccessToken"
-print("\n=== [7/8] 测试 getAccessToken (认证接口) ===")
-tmpToken = ifind::getAccessToken(refreshToken)
-// 只要返回的是非空字符串且有一定长度即视为成功 (注意: DolphinDB 中字符串标量的 size() 为 1，需用 strlen() 检查长度)
-assert 7, typestr(tmpToken) == "STRING" and strlen(tmpToken) > 10
-print("getAccessToken 验证通过")
-
-@testing:case = "test_getApiData"
-print("\n=== [8/8] 测试 getApiData (底层请求接口) ===")
-res = ifind::getApiData(accToken, "basic_data_service", {"codes":"600519.SH", "indipara":[{"indicator":"ths_stock_short_name_stock","indiparams":[]}]})
-assert 8, res.rows() > 0
-print("getApiData 验证通过")
+// 5. indicatorPara 日期格式兼容: YYYY-MM-DD 与 YYYYMMDD
+res1_6 = ifind::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_STOCK", ";20231231")
 
 
-// ====================================================
-// 第二部分：功能反向测试 (Reverse Functional Tests)
-// ====================================================
+// --- 1.2 thsDateSequence (日期序列数据) ---
+@testing:case = "test_thsDateSequence_Rich"
+print("\n=== 测试 thsDateSequence (日期序列) ===")
 
-@testing:case = "test_THS_HQ_Reverse", exception=1
-print("\n=== [反向测试] THS_HQ (处理无效指标请求) ===")
-try { ifind::THS_HQ(accToken, "600519.SH", "unknown_ind_abc", "", "2026-03-01", "2026-03-05"); assert 9, false } catch(ex) { print("捕获预期的业务逻辑异常: " + ex[1]) }
+// 1. codes 多标的输入
+res2_0 = ifind::thsDateSequence(accToken, "000001.SZ,600030.SH", "ths_pe_ttm_stock", "", "Interval:D", "2024-12-25", "2025-01-05")
 
-@testing:case = "test_THS_DS_Reverse", exception=1
-print("\n=== [反向测试] THS_DS (反向历史日期) ===")
-try { ifind::THS_DS(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-03-01", "2026-02-01"); assert 10, false } catch(ex) { print("捕获预期的日期范围异常: " + ex[1]) }
+// 2. 不同 Interval 周期 (D/W/M/Q/Y)，跨年跨月跨节假日
+res2_1 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:D", "2024-12-25", "2025-01-05")
+res2_2 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:W", "2024-11-25", "2025-01-05")
+res2_3 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:M", "2024-10-25", "2025-01-05")
+res2_4 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:Q", "2024-08-25", "2025-01-05")
+res2_5 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:Y", "2023-12-25", "2025-01-05")
 
+// 3. Days 日历日参数 (Days 与 Interval 同时存在时，Interval 无效，默认 D 数据；Days 单独生效，默认前值填充)
+res2_6 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Days:Alldays", "2024-12-25", "2025-01-05")
+res2_7 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2024-12-25", "2025-01-05")
 
-// ====================================================
-// 第三部分：异常与边界校验 (Error & Boundary Tests)
-// ====================================================
+// 4. Fill 填充参数 (当 Fill 存在时，Interval 可能无效，默认返回 D 数据 —— 待进一步确认)
+res2_8 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Fill:Previous", "2024-12-25", "2025-01-05")
+res2_9 = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Fill:Blank;Interval:W", "2024-12-25", "2025-01-05")
+res2_10 = ifind::thsDateSequence(accToken, "000001.SZ,600000.SH", "ths_close_price_stock", ",100,", "Fill:Previous;Interval:M", "2022-06-05", "2022-07-05")
 
-@testing:case = "test_ParamTypeValidation", exception=1
-print("\n=== [6/10] 参数类型校验测试 ===")
-// 6.1 Token 为 INT (预期报错)
-try { ifind::THS_RQ(12345, "600519.SH", "latest"); assert 61, false } catch(ex) { print("捕获预期的 Token 类型异常") }
+// 5. indicatorPara 日期格式兼容: YYYY-MM-DD 与 YYYYMMDD
+res2_11 = ifind::thsDateSequence(accToken, "600519.SH", "ths_total_shares_stock", "2022-07-05", "", "2024-12-25", "2025-01-05")
+res2_12 = ifind::thsDateSequence(accToken, "600519.SH", "ths_total_shares_stock", "20220705", "", "2024-12-25", "2025-01-05")
 
-// 6.2 codes 为 NULL (预期报错)
-try { ifind::THS_BD(accToken, NULL, "ths_stock_short_name_stock"); assert 62, false } catch(ex) { print("捕获预期的 codes NULL 异常") }
+// 6. 多指标 + 指标参数覆盖
+res2_13 = ifind::thsDateSequence(accToken, "000002.SZ", "ths_pe_ttm_stock,ths_pb_latest_stock", "", "Interval:W", "2024-01-01", "2024-03-01")
+res2_14 = ifind::thsDateSequence(accToken, "30033.SZ,600030.SH", "ths_total_equity_atoopc_stock,ths_regular_report_actual_dd_stock", ",100;", "Interval:D", startDate, endDate)
 
-// 6.3 indicators 类型错误 (INT 矢量，预期报错)
-try { ifind::THS_BD(accToken, "600519.SH", 123); assert 63, false } catch(ex) { print("捕获预期的 indicators 类型异常") }
-
-
-@testing:case = "test_ArgCountValidation", exception=1
-print("\n=== [7/10] 参数个数校验测试 ===")
-// 关键修复：使用 call 动态调用以绕过编译期语法检查，使其能在运行时触发异常
-try { 
-    call(ifind::THS_HQ, [accToken, "600519.SH", "close"])
-    assert 71, false 
-} catch(ex) { 
-    print("捕获预期的参数个数不足异常: " + ex[1]) 
-}
+assert 203, "ths_pb_latest_stock" in res2_6.columnNames()
 
 
-@testing:case = "test_InvalidApiName", exception=1
-print("\n=== [8/10] 无效接口名校验测试 ===")
-try { ifind::getApiData(accToken, "not_exist_api_999", {}); assert 81, false } catch(ex) { print("捕获预期的 API 接口名无效异常") }
+// --- 1.3 thsHistoryQuotes (历史 K 线行情) ---
+@testing:case = "test_thsHistoryQuotes_Rich"
+print("\n=== 测试 thsHistoryQuotes (历史行情) ===")
+
+// 1. 正常日行情，跨周、跨月、跨年
+res3_0 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Interval:D", "2024-12-01", "2025-01-10")
+
+// 2. 不同复权方式 CPS (1-不复权, 2-前复权, 3-后复权)
+res3_1 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "CPS:1,Interval:D", "2024-01-01", "2024-01-10")
+res3_2 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "CPS:2,Interval:D", "2024-01-01", "2024-01-10")
+res3_3 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "CPS:3,Interval:D", "2024-01-01", "2024-01-10")
+
+// 3. 不同 Fill 参数 (Previous-沿用前值, Blank-留空)
+res3_4 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Fill:Previous,Interval:D", "2024-01-01", "2024-01-10")
+res3_5 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Fill:Blank,Interval:D", "2024-01-01", "2024-01-10")
+
+// 4. 不同 Currency 货币类型 (GHB-港元, RMB-人民币, MHB-美元)
+res3_6 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Currency:GHB", "2024-01-01", "2024-01-10")
+res3_7 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Currency:RMB", "2024-01-01", "2024-01-10")
+res3_8 = ifind::thsHistoryQuotes(accToken, "600519.SH", "open,high,low,close,volume", "Currency:MHB", "2024-01-01", "2024-01-10")
 
 
-@testing:case = "test_EmptyStringValidation", exception=1
-print("\n=== [9/10] 空字符串校验测试 ===")
-try { ifind::THS_DS(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "", "2026-03-01"); assert 91, false } catch(ex) { print("捕获预期的日期空字符串异常") }
+// --- 1.4 thsHighFrequency (日内高频行情) ---
+@testing:case = "test_thsHighFrequency_Rich"
+print("\n=== 测试 thsHighFrequency (高频行情) ===")
+
+// 1. 1 分钟频率，跨日、跨周、跨月、跨年
+res4_1 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:1", "2024-12-25 09:25:00", "2025-01-05 09:35:00")
+
+// 2. 不同分钟频率 (5/10/15/30/60)
+res4_2 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:5", "2024-12-28 09:25:00", "2025-01-03 09:35:00")
+res4_3 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:10", "2024-12-28 09:25:00", "2025-01-03 09:35:00")
+res4_4 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:15", "2024-12-28 09:25:00", "2025-01-03 09:35:00")
+res4_5 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:30", "2024-12-28 09:25:00", "2025-01-03 09:35:00")
+res4_6 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Interval:60", "2024-12-28 09:25:00", "2025-01-03 09:35:00")
+
+// 3. 不同 Fill 参数 (Previous-沿用前值, Blank-留空)
+res4_7 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Fill:Previous", "2024-12-31 14:55:00", "2025-01-02 09:35:00")
+res4_8 = ifind::thsHighFrequency(accToken, "600519.SH", "close,open,volume", "Fill:Blank", "2024-12-31 14:55:00", "2025-01-02 09:35:00")
+
+// 4. 不同 Timeformat 参数 (BeiJingTime-北京时间, LocalTime-当地时间) —— 时区未生效，待排查
+res4_9 = ifind::thsHighFrequency(accToken, "600519.SH,BABA.US", "close,open,volume", "Timeformat:BeiJingTime", "2024-12-25 09:25:00", "2024-12-26 09:35:00")
+res4_10 = ifind::thsHighFrequency(accToken, "600519.SH,BABA.US", "close,open,volume", "Timeformat:LocalTime", "2024-12-25 09:25:00", "2024-12-26 09:35:00")
 
 
-@testing:case = "test_BusinessLogicError", exception=1
-print("\n=== [10/10] 业务逻辑错误测试 (无效 Token 响应) ===")
-try { 
-    ifind::THS_RQ("eyJzaWduIjoiaW52YWxpZCJ9.payload.sig", "600519.SH", "latest")
-    assert 10, false 
-} catch(ex) {
-    print("业务异常捕获成功: " + ex[1])
-}
+// --- 1.5 thsRealTime (实时行情快照) ---
+@testing:case = "test_thsRealTime_Rich"
+print("\n=== 测试 thsRealTime (实时行情) ===")
+
+// 1. 多标的 + 多指标实时快照
+res5_1 = ifind::thsRealTime(accToken, "600519.SH,000001.SZ", "latest,changeRatio,bid1,ask1")
 
 
-// ====================================================
-// 第四部分：深度与并发验证 (Advanced Execution)
-// ====================================================
-
-@testing:case = "test_ConcurrentExecution"
-print("\n=== [进阶] 并发执行测试 ===")
-def iFindConcurrentCall(tk, codes, ind){
+// --- 1.6 并发执行测试 (Concurrency Tests) ---
+@testing:case = "test_Concurrent_thsBasicData"
+print("\n=== 并发测试 thsBasicData ===")
+def concurrentBasicData(tk, codes, ind) {
     total = 0
-    for(i in 1..5){
-        res = ifind::THS_RQ(tk, codes, ind)
-        if(res.rows() > 0) total += 1
-        sleep(200) // 避免触发过于频繁的限流
+    for (i in 1..3) {
+        res = ifind::thsBasicData(tk, codes, ind)
+        if (res.rows() > 0) total += 1
+        sleep(500)
     }
     return total
 }
+jobs_bd = array(STRING, 0)
+for (i in 1..2) {
+    jobId = "ifind_bd_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel BasicData", concurrentBasicData, accToken, "600519.SH", "ths_stock_short_name_stock")
+    jobs_bd.append!(jobId)
+}
+for (jid in jobs_bd) { res = getJobReturn(jid, true); assert 601, res == 3 }
 
+@testing:case = "test_Concurrent_thsDateSequence"
+print("\n=== 并发测试 thsDateSequence ===")
+def concurrentDateSequence(tk, codes, ind, start, end) {
+    total = 0
+    for (i in 1..3) {
+        res = ifind::thsDateSequence(tk, codes, ind, "", "", start, end)
+        if (res.rows() > 0) total += 1
+        sleep(500)
+    }
+    return total
+}
+jobs_ds = array(STRING, 0)
+for (i in 1..2) {
+    jobId = "ifind_ds_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel DateSequence", concurrentDateSequence, accToken, "600519.SH", "ths_pe_ttm_stock", "2024-12-25", "2025-01-05")
+    jobs_ds.append!(jobId)
+}
+for (jid in jobs_ds) { res = getJobReturn(jid, true); assert 602, res == 3 }
+
+@testing:case = "test_Concurrent_thsHistoryQuotes"
+print("\n=== 并发测试 thsHistoryQuotes ===")
+def concurrentHistoryQuotes(tk, codes, ind, start, end) {
+    total = 0
+    for (i in 1..3) {
+        res = ifind::thsHistoryQuotes(tk, codes, ind, "", start, end)
+        if (res.rows() > 0) total += 1
+        sleep(500)
+    }
+    return total
+}
+jobs_hq = array(STRING, 0)
+for (i in 1..2) {
+    jobId = "ifind_hq_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel HistoryQuotes", concurrentHistoryQuotes, accToken, "600519.SH", "open,high,low,close", "2024-01-01", "2024-01-10")
+    jobs_hq.append!(jobId)
+}
+for (jid in jobs_hq) { res = getJobReturn(jid, true); assert 603, res == 3 }
+
+@testing:case = "test_Concurrent_thsHighFrequency"
+print("\n=== 并发测试 thsHighFrequency ===")
+def concurrentHighFrequency(tk, codes, ind, start, end) {
+    total = 0
+    for (i in 1..3) {
+        res = ifind::thsHighFrequency(tk, codes, ind, "Interval:5", start, end)
+        if (res.rows() > 0) total += 1
+        sleep(500)
+    }
+    return total
+}
+jobs_hf = array(STRING, 0)
+for (i in 1..2) {
+    jobId = "ifind_hf_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel HighFrequency", concurrentHighFrequency, accToken, "600519.SH", "close,volume", "2024-12-30 09:30:00", "2024-12-30 10:00:00")
+    jobs_hf.append!(jobId)
+}
+for (jid in jobs_hf) { res = getJobReturn(jid, true); assert 604, res == 3 }
+
+@testing:case = "test_Concurrent_thsRealTime"
+print("\n=== 并发测试 thsRealTime ===")
+def concurrentRealTime(tk, codes, ind) {
+    total = 0
+    for (i in 1..3) {
+        res = ifind::thsRealTime(tk, codes, ind)
+        if (res.rows() > 0) total += 1
+        sleep(500)
+    }
+    return total
+}
+jobs_rt = array(STRING, 0)
+for (i in 1..2) {
+    jobId = "ifind_rt_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel RealTime", concurrentRealTime, accToken, "600519.SH", "latest")
+    jobs_rt.append!(jobId)
+}
+for (jid in jobs_rt) { res = getJobReturn(jid, true); assert 605, res == 3 }
+
+// ====================================================
+// 第二部分：系统化异常校验 (Systematic Exception Tests)
+// ====================================================
+
+// --- 2.1 thsBasicData 异常校验 ---
+
+@testing:case = "test_thsBasicData_arg_count_less", syntaxError=1
+ifind::thsBasicData(accToken, "600519.SH")
+
+@testing:case = "test_thsBasicData_arg_count_more", syntaxError=1
+ifind::thsBasicData(accToken, "600519.SH", "ind", "", "extra")
+
+@testing:case = "test_thsBasicData_token_type", exception=1
+ifind::thsBasicData(12345, "600519.SH", "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_token_form", exception=1
+ifind::thsBasicData(["tk1"], "600519.SH", "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_codes_type", exception=1
+ifind::thsBasicData(accToken, 600519, "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_codes_form", exception=1
+ifind::thsBasicData(accToken, matrix(INT, 2, 2), "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_codes_null", exception=1
+ifind::thsBasicData(accToken, NULL, "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_codes_empty_vec", exception=1
+ifind::thsBasicData(accToken, array(STRING, 0), "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_codes_vec_with_null", exception=1
+ifind::thsBasicData(accToken, ["600519.SH", NULL, ""], "ths_roe_stock")
+
+@testing:case = "test_thsBasicData_indicators_type", exception=1
+ifind::thsBasicData(accToken, "600519.SH", 2024.12.31)
+
+@testing:case = "test_thsBasicData_indicators_empty", exception=1
+ifind::thsBasicData(accToken, "600519.SH", "")
+
+@testing:case = "test_thsBasicData_indipara_type", exception=1
+ifind::thsBasicData(accToken, "600519.SH", "ths_roe_stock", 100)
+
+
+// --- 2.2 thsDateSequence 异常校验 ---
+
+@testing:case = "test_thsDateSequence_arg_count_less", syntaxError=1
+ifind::thsDateSequence(accToken, "600519.SH", "ind", "", "")
+
+@testing:case = "test_thsDateSequence_arg_count_more", syntaxError=1
+ifind::thsDateSequence(accToken, "600519.SH", "ind", "", "", "", "", "extra")
+
+@testing:case = "test_thsDateSequence_token_type", exception=1
+ifind::thsDateSequence(2026.01.01, "600519.SH", "ths_pe_ttm_stock", "", "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsDateSequence_codes_type", exception=1
+ifind::thsDateSequence(accToken, table(1..3 as id), "ths_pe_ttm_stock", "", "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsDateSequence_indicators_type", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", 123.456, "", "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsDateSequence_indipara_vector", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", ["p1", "p2"], "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsDateSequence_functionpara_matrix", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", matrix(STRING, 2, 2), "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsDateSequence_startdate_type", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", 2026.01.01, "2026.02.01")
+
+@testing:case = "test_thsDateSequence_startdate_null", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", string(NULL), "2026.02.01")
+
+@testing:case = "test_thsDateSequence_logic_reversal", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026.03.01", "2026.01.01")
+
+@testing:case = "test_thsDateSequence_logic_same", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-03-01", "2026.03.01")
+
+@testing:case = "test_thsDateSequence_logic_same", exception=1
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2026-03-01", "2026-01-01")
+
+
+
+// --- 2.3 thsHistoryQuotes 异常校验 ---
+
+@testing:case = "test_thsHistoryQuotes_arg_count_less", syntaxError=1
+ifind::thsHistoryQuotes(accToken, "600519.SH", "ind", "")
+
+@testing:case = "test_thsHistoryQuotes_arg_count_more", syntaxError=1
+ifind::thsHistoryQuotes(accToken, "600519.SH", "ind", "", "", "", "extra")
+
+@testing:case = "test_thsHistoryQuotes_token_null", exception=1
+ifind::thsHistoryQuotes(NULL, "600519.SH", "close", "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsHistoryQuotes_codes_intscalar", exception=1
+ifind::thsHistoryQuotes(accToken, 600519, "open,close", "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsHistoryQuotes_indicators_null", exception=1
+ifind::thsHistoryQuotes(accToken, "600519.SH", NULL, "", "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsHistoryQuotes_functionpara_form", exception=1
+ifind::thsHistoryQuotes(accToken, "600519.SH", "close", ["a", "b"], "2026.01.01", "2026.02.01")
+
+@testing:case = "test_thsHistoryQuotes_date_format", exception=1
+ifind::thsHistoryQuotes(accToken, "600519.SH", "close", "", "2026/01/01 09:00", "2026/02/01")
+
+
+// --- 2.4 thsHighFrequency 异常校验 ---
+
+@testing:case = "test_thsHighFrequency_arg_count_less", syntaxError=1
+ifind::thsHighFrequency(accToken, "600519.SH", "ind", "")
+
+@testing:case = "test_thsHighFrequency_arg_count_more", syntaxError=1
+ifind::thsHighFrequency(accToken, "600519.SH", "ind", "", "", "", "extra")
+
+@testing:case = "test_thsHighFrequency_starttime_missing_sec", exception=1
+// thsHighFrequency 要求必须包含秒。如果模块未在 DDB 侧拦截，API 也会报错
+ifind::thsHighFrequency(accToken, "600519.SH", "open", "", "2026-03-11 09:30", "2026-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_codes_matrix", exception=1
+ifind::thsHighFrequency(accToken, matrix(STRING, 1, 1), "open", "", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_indicators_empty_vec", exception=1
+ifind::thsHighFrequency(accToken, "600519.SH", array(STRING, 0), "", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
+
+
+// --- 2.5 thsRealTime 异常校验 ---
+
+@testing:case = "test_thsRealTime_arg_count_less", syntaxError=1
+ifind::thsRealTime(accToken, "600519.SH")
+
+@testing:case = "test_thsRealTime_arg_count_more", syntaxError=1
+ifind::thsRealTime(accToken, "600519.SH", "ind", "extra")
+
+@testing:case = "test_thsRealTime_token_type", exception=1
+ifind::thsRealTime(1234.56, "600519.SH", "latest")
+
+@testing:case = "test_thsRealTime_codes_null_scalar", exception=1
+ifind::thsRealTime(accToken, string(NULL), "latest")
+
+@testing:case = "test_thsRealTime_indicators_form", exception=1
+ifind::thsRealTime(accToken, "600519.SH", ["latest", "amount"])
+
+// --- 2.6 getAccessToken 异常校验 ---
+
+@testing:case = "test_getAccessToken_arg_count_less", syntaxError=1
+ifind::getAccessToken()
+
+@testing:case = "test_getAccessToken_arg_count_more", syntaxError=1
+ifind::getAccessToken(refreshToken, "extra")
+
+@testing:case = "test_getAccessToken_type", exception=1
+ifind::getAccessToken(12345)
+
+@testing:case = "test_getAccessToken_null", exception=1
+ifind::getAccessToken(NULL)
+
+@testing:case = "test_getAccessToken_empty", exception=1
+ifind::getAccessToken("")
+
+@testing:case = "test_getAccessToken_too_short", exception=1
+// 触发长度 < 100 的启发式逻辑拦截
+ifind::getAccessToken("eyJ_too_short_token")
+
+@testing:case = "test_getAccessToken_invalid_content", exception=1
+// 长度足够但内容是胡乱构造的 Base64，预期触发 API 401 报错
+fake_long_token = take("a", 150).concat("")
+ifind::getAccessToken(fake_long_token)
+
+// ====================================================
+// 第三部分：功能反向测试 (Reverse Functional Tests)
+// ====================================================
+
+// --- 3.1 thsBasicData 内容反向 ---
+
+@testing:case = "test_thsBasicData_invalid_codes", exception=1
+// 格式正确(String)，但代码不存在
+ifind::thsBasicData(accToken, "999999.ZZ", "ths_stock_short_name_stock")
+
+@testing:case = "test_thsBasicData_invalid_indicators", exception=1
+// 格式正确，但指标名错误
+ifind::thsBasicData(accToken, "600519.SH", "ths_wrong_indicator_abc")
+
+@testing:case = "test_thsBasicData_invalid_indipara", exception=1
+// 格式正确，但参数 Key 或内容无效，能返回空值
+ifind::thsBasicData(accToken, "600519.SH", "ths_roe_stock", "invalid_key:value")
+
+
+// --- 3.2 thsDateSequence 内容反向 ---
+
+@testing:case = "test_thsDateSequence_invalid_interval", exception=1
+// 格式正确，但 Interval 取值非法 (应为 D/W/M/Q/S/Y)，选填参数不影响结果
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:Z", "2024-01-01", "2024-02-01")
+
+@testing:case = "test_thsDateSequence_future_date", exception=1
+// 查询未来日期的数据 (假设 API 侧会报错)，thsDateSequence默认返回最后一天数据
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2030-01-01", "2030-01-10")
+
+
+// --- 3.3 thsHistoryQuotes 内容反向 ---
+
+@testing:case = "test_thsHistoryQuotes_invalid_cps", exception=1
+// 格式正确，但复权方式 (CPS) 为无效数字，选填参数不影响结果
+ifind::thsHistoryQuotes(accToken, "600519.SH", "close", "CPS:99", "2024-01-01", "2024-02-01")
+
+@testing:case = "test_thsHistoryQuotes_not_listed_date", exception=1
+// 查询股票没有数据的区间日期，会报错。
+ifind::thsHistoryQuotes(accToken, "600519.SH", "close", "", "1990-01-01", "1990-01-10")
+
+
+// --- 3.4 thsHighFrequency 内容反向 ---
+@testing:case = "test_thsHighFrequency_invalid_codes", exception=1
+// 格式正确，但代码不存在 
+ifind::thsHighFrequency(accToken, "INVALID.TICKER", "open", "Interval:1", "2024-03-11 09:30:00", "2024-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_invalid_frequency", exception=1
+// 格式正确，但不支持的分钟频率 (如 17 分钟)
+ifind::thsHighFrequency(accToken, "600519.SH", "open", "Interval:17", "2024-03-11 09:30:00", "2024-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_invalid_indicators", exception=1
+// 格式正确，但指标名错误
+ifind::thsHighFrequency(accToken, "600519.SH", "open_close", "Interval:1", "2024-03-11 09:30:00", "2024-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_invalid_date", exception=1
+// 格式正确，但指标名错误
+ifind::thsHighFrequency(accToken, "600519.SH", "open_close", "Interval:1", "2024-03-11 09:30:00", "2024-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_invalid_date", exception=1
+// 格式正确，但日期早晚
+ifind::thsHighFrequency(accToken, "600519.SH", "open_close", "Interval:1", "2024-03-11 21:30:00", "2024-03-11 15:00:00")
+
+@testing:case = "test_thsHighFrequency_weekend_query", exception=1
+// 在非交易日(周末)查询高频数据
+ifind::thsHighFrequency(accToken, "600519.SH", "open", "", "2026-03-15 09:30:00", "2026-03-15 15:00:00")
+
+
+// --- 3.5 thsRealTime 内容反向 ---
+@testing:case = "test_thsRealTime_invalid_token", exception=1
+// token瞎输入，会直接报错
+ifind::thsRealTime("INVALID.TOKEN", "600519.SH", "latest")
+
+@testing:case = "test_thsRealTime_invalid_codes", exception=1
+// 格式正确，但代码不存在，会直接报错
+ifind::thsRealTime(accToken, "INVALID.TICKER", "latest")
+
+@testing:case = "test_thsRealTime_mixed_codes", exception=1
+// 混合了正确和明显错误的代码 (取决于 API 是部分返回还是整体报错),部分返回
+ifind::thsRealTime(accToken, "600519.SH,INVALID.TICKER", "latest")
+
+@testing:case = "test_thsRealTime_error_ind", exception=1
+// 混合了正确和明显错误的指标 (取决于 API 是部分返回还是整体报错)，部分返回
+ifind::thsRealTime(accToken, "600519.SH", "close,hh_cc")
+
+@testing:case = "test_thsRealTime_invalid_indicators", exception=1
+// 输入明显的错误指标，会直接报错
+ifind::thsRealTime(accToken, "600519.SH", "hh_cc")
+
+// ====================================================
+// 第四部分：依赖校验 (Dependency Validation)
+// ====================================================
+
+@testing:case = "test_MissingHttpClientPlugin", exception=1
+// 模拟 httpClient 插件未加载的情况
+try {
+    loadPlugin("httpClient"); 
+    go
+ 
+} catch(x) { 
+    print("Module load failed: " + x) 
+}
+
+// 测试完成后应当恢复环境，以免影响后续测试 (虽然这个 case 之后会 throw)
+// 真正的单元测试框架中，此行可能不会被执行，但在手动调试时很重要
+// loadPlugin("httpClient") 
+
+// ====================================================
+// 第五部分：深度与并发验证 (Advanced Execution)
+// ====================================================
+
+@testing:case = "test_ConcurrentExecution"
+print("\n=== [进阶] 并发执行测试 (thsRealTime) ===")
+def iFindConcurrentCall(tk, codes, ind){
+    total = 0
+    for(i in 1..3){
+        res = ifind::thsRealTime(tk, codes, ind)
+        if(res.rows() > 0) total += 1
+        sleep(500)
+    }
+    return total
+}
 jobs = array(STRING, 0)
-for(i in 1..4){
-    jobId = "ifind_job_" + string(i)
-    submitJob(jobId, "iFinD Parallel Test", iFindConcurrentCall, accToken, "600519.SH", "latest")
+for(i in 1..2){
+    jobId = "ifind_rq_job_" + string(i)
+    submitJob(jobId, "iFinD Parallel RQ", iFindConcurrentCall, accToken, "600519.SH", "latest")
     jobs.append!(jobId)
 }
+for(jid in jobs){ res = getJobReturn(jid, true); assert 11, res == 3 }
 
-// 等待所有任务完成并获取结果
-for(jid in jobs){
-    res = getJobReturn(jid, true)
-    assert 11, res == 5 // 每个任务执行 5 次成功
+@testing:case = "test_ConcurrentExecution_DS"
+print("\n=== [进阶] 并发执行测试 (thsDateSequence) ===")
+def iFindConcurrentDS(tk, codes, ind, start, end){
+    res = ifind::thsDateSequence(tk, codes, ind, "", "", start, end)
+    return res.rows()
 }
-print("并发测试完成 (4个并发任务已成功结束)")
+jobId1 = "ifind_ds_job_1"
+submitJob(jobId1, "iFinD Parallel DS", iFindConcurrentDS, accToken, "000001.SZ", "ths_pe_ttm_stock", "2026-02-01", "2026-03-01")
+res1 = getJobReturn(jobId1, true)
+assert 12, res1 > 0
+
+
+// ====================================================
+// 第六部分：深度参数校验与正确性补充 (Comprehensive Validation)
+// ====================================================
+
+@testing:case = "test_thsDateSequence_ParamTypes", exception=1
+// 1.1 codes 为 INT (预期报错)
+ifind::thsDateSequence(accToken, 123, "ths_pe_ttm_stock", "", "", "2026-01-01", "2026-02-01")
+
+@testing:case = "test_thsDateSequence_IndicatorsEmptyVector", exception=1
+// 1.2 indicators 为空向量 (预期报错)
+ifind::thsDateSequence(accToken, "600519.SH", array(STRING, 0), "", "", "2026-01-01", "2026-02-01")
+
+@testing:case = "test_thsDateSequence_FunctionparaMatrix", exception=1
+// 1.3 functionpara 为矩阵 (预期报错)
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", matrix(INT, 2, 2), "2026-01-01", "2026-02-01")
+
+@testing:case = "test_thsDateSequence_DateType", exception=1
+// 1.4 startdate 为 DATE 类型而非 STRING (预期报错)
+ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", 2026.01.01, "2026-02-01")
+
+@testing:case = "test_getApiData_WrongParamsType", exception=1
+// params 为 INT (预期报错)
+ifind::getApiData(accToken, "basic_data_service", 123)
+
+@testing:case = "test_getAccessToken_WrongInput", exception=1
+// 输入的是 accToken 而不是 refreshToken (启发式校验，长度不足)
+ifind::getAccessToken("some_short_token")
+
+@testing:case = "test_Correctness_TokenTypes"
+print("\n=== [完善] 正确性: 支持 AccessToken 和 refreshToken ===")
+// 测试直接传 refreshToken (内部会调用 getAccessToken)
+tb_ref = ifind::thsRealTime(refreshToken, "600519.SH", "latest")
+assert 13, tb_ref.rows() > 0
+// 测试传 accToken
+tb_acc = ifind::thsRealTime(accToken, "600519.SH", "latest")
+assert 14, tb_acc.rows() > 0
+
+@testing:case = "test_Correctness_VectorInputs"
+print("\n=== [完善] 正确性: 支持 String Vector, bigarray, subarray ===")
+codes_vec = ["600519.SH", "600000.SH"]
+tb_vec = ifind::thsBasicData(accToken, codes_vec, "ths_stock_short_name_stock")
+assert 15, tb_vec.rows() == 2
+
+codes_big = bigarray(STRING, 0)
+codes_big.append!(codes_vec)
+tb_big = ifind::thsBasicData(accToken, codes_big, "ths_stock_short_name_stock")
+assert 16, tb_big.rows() == 2
+
+codes_sub = codes_vec.subarray(0:1)
+tb_sub = ifind::thsBasicData(accToken, codes_sub, "ths_stock_short_name_stock")
+assert 17, tb_sub.rows() == 1
+
+@testing:case = "test_Correctness_LongVector", exception=1
+// 构造一个长度 > 1024 的向量 (验证 checkCodes 逻辑及 iFinD API 请求限制)
+long_vec = take("600519.SH", 1025)
+ifind::thsRealTime(accToken, long_vec, "latest")
+
+@testing:case = "test_Correctness_DateRange"
+print("\n=== [完善] 正确性: 跨月/跨年日期 ===")
+tb_cross = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", "2024-12-25", "2025-01-05")
+assert 18, tb_cross.rows() > 0
 
 print("\n====================================================")
-print("  iFinD 核心模块 [全函数功能测试] + [异常校验] 执行完毕  ")
+print("  iFinD 核心模块 [深度验证全覆盖版] 执行完毕  ")
 print("====================================================")
+
