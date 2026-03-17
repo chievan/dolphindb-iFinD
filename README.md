@@ -68,7 +68,7 @@ ifind::thsBasicData(token, codes, indicators, [indiPara])
 **参数**
 
 - **token**：STRING 类型标量，支持 *refreshToken* 或 *accessToken*。
-- **codes**：STRING 类型标量/向量，证券代码。如 `"600519.SH,000001.SZ"` 或 `["600519.SH", "000001.SZ"]`。
+- **codes**：STRING 类型标量，证券代码，多个代码用半角逗号分隔。如 `"600519.SH,000001.SZ"`。
 - **indicators**：STRING 类型标量，指标英文名，逗号分隔。
 - **indiPara**：STRING 类型标量，可选。指标参数，不同指标用分号分隔。详见 [字典参数常用配置](#5-字典参数常用配置)。
 
@@ -109,7 +109,7 @@ ifind::thsDateSequence(token, codes, indicators, indiPara, functionPara, startDa
 **参数**
 
 - **token**：STRING 类型标量。
-- **codes**：STRING 类型标量/向量。如 `"600519.SH"` 或 `["600519.SH", "600030.SH"]`。
+- **codes**：STRING 类型标量，多个代码用半角逗号分隔。如 `"600519.SH,600030.SH"`。
 - **indicators**：STRING 类型标量。
 - **indiPara**：STRING 类型标量，指标参数。
 - **functionPara**：STRING 类型标量，配置项。如 `"Interval:D"` 表示日频。详见 [字典参数常用配置](#5-字典参数常用配置)。
@@ -153,7 +153,7 @@ ifind::thsHistoryQuotes(token, codes, indicators, functionPara, startDate, endDa
 **参数**
 
 - **token**：STRING 类型标量。
-- **codes**：STRING 类型标量/向量。
+- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
 - **indicators**：STRING 类型标量，常用 `"open,high,low,close,volume,amount"`。
 - **functionPara**：STRING 类型标量，行情配置。如 `"CPS:2"` 表示前复权。详见 [字典参数常用配置](#5-字典参数常用配置)。
 - **startDate** / **endDate**：STRING 类型标量，格式为 `"YYYY-MM-DD"`。
@@ -194,7 +194,7 @@ ifind::thsHighFrequency(token, codes, indicators, functionPara, startTime, endTi
 **参数**
 
 - **token**：STRING 类型标量。
-- **codes**：STRING 类型标量/向量。
+- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
 - **indicators**：STRING 类型标量。
 - **functionPara**：STRING 类型标量。常用 `"Interval:1"`。详见 [字典参数常用配置](#5-字典参数常用配置)。
 - **startTime**：STRING 类型标量，格式为 `"YYYY-MM-DD HH:mm:ss"`。须含秒。
@@ -236,7 +236,7 @@ ifind::thsRealTime(token, codes, indicators)
 **参数**
 
 - **token**：STRING 类型标量。
-- **codes**：STRING 类型标量/向量。
+- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
 - **indicators**：STRING 类型标量。
 
 **返回值**
@@ -298,9 +298,9 @@ ifind::getAccessToken(refreshToken)
 模块内部会对输入进行前置过滤，不合法的输入会直接触发异常提示而不消耗 API 流量：
 
 - **格式校验**: *startDate* 必须符合 `"YYYY-MM-DD"`；*startTime* 必须符合 `"YYYY-MM-DD HH:mm:ss"`。
-- **类型校验**: 所有参数必须为 `STRING scalar`。其中 *codes* 额外支持 `STRING vector`。
+- **类型校验**: 所有参数必须为 `STRING scalar`。
 - **报错效果**:
-  - `codes must be a STRING scalar/vector`
+  - `codes must be a STRING scalar`
   - `startDate must follow 'YYYY-MM-DD'`
 
 ### 6.2 dataVol 监控
