@@ -2,7 +2,7 @@
 
 ## 1. 模块介绍
 
-`ifind` 模块是对同花顺 iFinD HTTP API 的深度封装，旨在为 DolphinDB 用户提供原生、高速、稳定的金融数据接入方案。通过该模块，用户可以在 DolphinDB 脚本中直接获取 A 股、港股、美股、基金、债券、指数等全品种行情及各种财务、估值指标，并自动解析为结构化的 `Table` 对象。
+`iFinD` 模块是对同花顺 iFinD HTTP API 的深度封装，旨在为 DolphinDB 用户提供原生、高速、稳定的金融数据接入方案。通过该模块，用户可以在 DolphinDB 脚本中直接获取 A 股、港股、美股、基金、债券、指数等全品种行情及各种财务、估值指标，并自动解析为结构化的 `Table` 对象。
 
 **核心优势**:
 
@@ -43,13 +43,13 @@ loadPlugin("httpClient");
 2. 使用 `installModule` 函数安装模块。
 
    ```
-   installModule("ifind")
+   installModule("iFinD")
    ```
 
 3. 使用 use 关键字加载模块。
 
    ```
-   use ifind
+   use iFinD
    ```
 ### 2.3 凭证获取
 
@@ -68,7 +68,7 @@ loadPlugin("httpClient");
 refreshToken = "eyJ..." 
 
 // 调用接口获取临时访问令牌
-accToken = ifind::getAccessToken(refreshToken)
+accToken = iFinD::getAccessToken(refreshToken)
 ```
 
 ---
@@ -82,7 +82,7 @@ accToken = ifind::getAccessToken(refreshToken)
 **语法**
 
 ```dolphindb
-ifind::thsBasicData(token, code, indicator, [indicatorParam])
+iFinD::thsBasicData(token, code, indicator, [indicatorParam])
 ```
 
 **详情**
@@ -106,8 +106,8 @@ ifind::thsBasicData(token, code, indicator, [indicatorParam])
 **示例**
 
 ```dolphindb
-accToken = ifind::getAccessToken(refreshToken)
-tb = ifind::thsBasicData(accToken, "600519.SH,600518.SH", "ths_stock_short_name_stock")
+accToken = iFinD::getAccessToken(refreshToken)
+tb = iFinD::thsBasicData(accToken, "600519.SH,600518.SH", "ths_stock_short_name_stock")
 ```
 
 **返回样例**
@@ -126,7 +126,7 @@ tb = ifind::thsBasicData(accToken, "600519.SH,600518.SH", "ths_stock_short_name_
 **语法**
 
 ```dolphindb
-ifind::thsDateSequence(token, code, indicator, indicatorParam, config, startDate, endDate)
+iFinD::thsDateSequence(token, code, indicator, indicatorParam, config, startDate, endDate)
 ```
 
 **详情**
@@ -156,7 +156,7 @@ ifind::thsDateSequence(token, code, indicator, indicatorParam, config, startDate
 **示例**
 
 ```dolphindb
-tb = ifind::thsDateSequence(accToken, "600519.SH,600518.SH", "ths_pe_ttm_stock,ths_pb_latest_stock", "100;100", "", "2026-02-01", "2026-03-01")
+tb = iFinD::thsDateSequence(accToken, "600519.SH,600518.SH", "ths_pe_ttm_stock,ths_pb_latest_stock", "100;100", "", "2026-02-01", "2026-03-01")
 ```
 
 **返回样例**
@@ -176,7 +176,7 @@ tb = ifind::thsDateSequence(accToken, "600519.SH,600518.SH", "ths_pe_ttm_stock,t
 **语法**
 
 ```dolphindb
-ifind::thsHistoryQuotes(token, code, indicator, config, startDate, endDate)
+iFinD::thsHistoryQuotes(token, code, indicator, config, startDate, endDate)
 ```
 
 **详情**
@@ -204,7 +204,7 @@ ifind::thsHistoryQuotes(token, code, indicator, config, startDate, endDate)
 **示例**
 
 ```dolphindb
-tb = ifind::thsHistoryQuotes(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Fill:Original", "2026-03-01", "2026-03-05")
+tb = iFinD::thsHistoryQuotes(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Fill:Original", "2026-03-01", "2026-03-05")
 ```
 
 **返回样例**
@@ -223,7 +223,7 @@ tb = ifind::thsHistoryQuotes(accToken, "600519.SH,600518.SH", "open,high,low,clo
 **语法**
 
 ```dolphindb
-ifind::thsHighFrequency(token, code, indicator, config, startTime, endTime)
+iFinD::thsHighFrequency(token, code, indicator, config, startTime, endTime)
 ```
 
 **详情**
@@ -251,7 +251,7 @@ ifind::thsHighFrequency(token, code, indicator, config, startTime, endTime)
 **示例**
 
 ```dolphindb
-tb = ifind::thsHighFrequency(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Interval:1,Fill:Original", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
+tb = iFinD::thsHighFrequency(accToken, "600519.SH,600518.SH", "open,high,low,close,volume", "Interval:1,Fill:Original", "2026-03-11 09:30:00", "2026-03-11 15:00:00")
 ```
 
 **返回样例**
@@ -270,7 +270,7 @@ tb = ifind::thsHighFrequency(accToken, "600519.SH,600518.SH", "open,high,low,clo
 **语法**
 
 ```dolphindb
-ifind::thsRealTime(token, code, indicator)
+iFinD::thsRealTime(token, code, indicator)
 ```
 
 **详情**
@@ -292,7 +292,7 @@ ifind::thsRealTime(token, code, indicator)
 **示例**
 
 ```dolphindb
-tb = ifind::thsRealTime(accToken, "600519.SH,601318.SH", "latest")
+tb = iFinD::thsRealTime(accToken, "600519.SH,601318.SH", "latest")
 ```
 
 **返回样例**
@@ -313,7 +313,7 @@ tb = ifind::thsRealTime(accToken, "600519.SH,601318.SH", "latest")
 **语法**
 
 ```dolphindb
-ifind::getAccessToken(refreshToken)
+iFinD::getAccessToken(refreshToken)
 ```
 
 **参数**
@@ -365,7 +365,7 @@ ifind::getAccessToken(refreshToken)
 
 ```dolphindb
 def parallelLoad(tk, sym){
-    return ifind::thsRealTime(tk, sym, "latest")
+    return iFinD::thsRealTime(tk, sym, "latest")
 }
 submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
 ```
