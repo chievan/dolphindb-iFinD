@@ -17,17 +17,41 @@
 
 ### 2.1 依赖安装与加载
 
-本模块依赖 DolphinDB 内置的 `httpClient` 网络插件。
+本模块依赖 DolphinDB 官方的 `httpClient` 网络插件。
 
-```dolphindb
-// 加载插件
-try { loadPlugin("httpClient") } catch(ex) {}
-
-// 导入模块
-use ifind
+注意：在使用本模块前请按照 [httpClient 插件说明](https://docs.dolphindb.cn/zh/plugins/httpClient/httpclient.html)进行安装。例如可执行下列命令安装、加载，或在节点配置文件中配置  `preloadModules=plugins::httpClient`：
+```
+installPlugin("httpClient");
+loadPlugin("httpClient");
 ```
 
-### 2.2 凭证获取
+### 2.2 安装模块
+
+#### 版本要求
+- 支持 DolphinDB Server 2.00.17 及以上版本。
+- 支持 Linux x64，Linux ARM ，Linux ABI，Windows x64。
+
+#### 安装步骤
+
+1. 在 DolphinDB 客户端中使用 `listRemoteModules` 函数查询可用的模块。
+
+   ```
+   login("admin", "123456")
+   listRemoteModules()
+   ```
+
+2. 使用 `installModule` 函数安装模块。
+
+   ```
+   installModule("ifind")
+   ```
+
+3. 使用 use 关键字加载模块。
+
+   ```
+   use ifind
+   ```
+### 2.3 凭证获取
 
 要使用 iFinD 数据服务，您需要首先在同花顺 iFinD 终端获取长效凭证，并通过模块置换为访问令牌：
 
@@ -58,7 +82,7 @@ accToken = ifind::getAccessToken(refreshToken)
 **语法**
 
 ```dolphindb
-ifind::thsBasicData(token, codes, indicators, [indiPara])
+ifind::thsBasicData(token, code, indicator, [indicatorParam])
 ```
 
 **详情**
@@ -67,14 +91,17 @@ ifind::thsBasicData(token, codes, indicators, [indiPara])
 
 **参数**
 
-- **token**：STRING 类型标量，支持 *refreshToken* 或 *accessToken*。
-- **codes**：STRING 类型标量，证券代码，多个代码用半角逗号分隔。如 `"600519.SH,000001.SZ"`。
-- **indicators**：STRING 类型标量，指标英文名，逗号分隔。
-- **indiPara**：STRING 类型标量，可选。指标参数，不同指标用分号分隔。详见 [字典参数常用配置](#5-字典参数常用配置)。
+**token** STRING 类型标量，支持 refreshToken 或 accessToken。
+
+**code** STRING 类型标量，证券代码，多个代码用半角逗号分隔。如 "600519.SH,000001.SZ"。
+
+**indicator** STRING 类型标量，指标英文名，逗号分隔。
+
+**indicatorParam** STRING 类型标量，可选。指标参数，不同指标用分号分隔。
 
 **返回值**
 
-返回一个 Table。包含证券代码列 `ths_code` 以及各请求指标对应的列。
+返回一个 Table。包含证券代码列 ths_code 以及各请求指标对应的列。
 
 **示例**
 
@@ -99,7 +126,7 @@ tb = ifind::thsBasicData(accToken, "600519.SH,600518.SH", "ths_stock_short_name_
 **语法**
 
 ```dolphindb
-ifind::thsDateSequence(token, codes, indicators, indiPara, functionPara, startDate, endDate)
+ifind::thsDateSequence(token, code, indicator, indicatorParam, config, startDate, endDate)
 ```
 
 **详情**
@@ -108,17 +135,23 @@ ifind::thsDateSequence(token, codes, indicators, indiPara, functionPara, startDa
 
 **参数**
 
-- **token**：STRING 类型标量。
-- **codes**：STRING 类型标量，多个代码用半角逗号分隔。如 `"600519.SH,600030.SH"`。
-- **indicators**：STRING 类型标量。
-- **indiPara**：STRING 类型标量，指标参数。
-- **functionPara**：STRING 类型标量，配置项。如 `"Interval:D"` 表示日频。详见 [字典参数常用配置](#5-字典参数常用配置)。
-- **startDate**：STRING 类型标量，格式为 `"YYYY-MM-DD"`。表示开始日期。
-- **endDate**：STRING 类型标量，格式为 `"YYYY-MM-DD"`。必须晚于或等于 *startDate*。
+**token** STRING 类型标量。
+
+**code** STRING 类型标量，多个代码用半角逗号分隔。如 "600519.SH,600030.SH"。
+
+**indicator** STRING 类型标量。
+
+**indicatorParam** STRING 类型标量，指标参数。
+
+**config** STRING 类型标量，配置项。如 "Interval:D" 表示日频。详见 [字典参数常用配置](#5-字典参数常用配置)。
+
+**startDate** STRING 类型标量，格式为 "YYYY-MM-DD"。表示开始日期。
+
+**endDate** STRING 类型标量，格式为 "YYYY-MM-DD"。必须晚于或等于 startDate。
 
 **返回值**
 
-返回一个 Table。包含日期列 `time`、证券代码列 `ths_code` 及对应指标列。
+返回一个 Table。包含日期列 time、证券代码列 ths_code 及对应指标列。
 
 **示例**
 
@@ -143,7 +176,7 @@ tb = ifind::thsDateSequence(accToken, "600519.SH,600518.SH", "ths_pe_ttm_stock,t
 **语法**
 
 ```dolphindb
-ifind::thsHistoryQuotes(token, codes, indicators, functionPara, startDate, endDate)
+ifind::thsHistoryQuotes(token, code, indicator, config, startDate, endDate)
 ```
 
 **详情**
@@ -152,11 +185,17 @@ ifind::thsHistoryQuotes(token, codes, indicators, functionPara, startDate, endDa
 
 **参数**
 
-- **token**：STRING 类型标量。
-- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
-- **indicators**：STRING 类型标量，常用 `"open,high,low,close,volume,amount"`。
-- **functionPara**：STRING 类型标量，行情配置。如 `"CPS:2"` 表示前复权。详见 [字典参数常用配置](#5-字典参数常用配置)。
-- **startDate** / **endDate**：STRING 类型标量，格式为 `"YYYY-MM-DD"`。
+**token** STRING 类型标量。
+
+**code** STRING 类型标量，多个代码用半角逗号分隔。
+
+**indicator** STRING 类型标量，常用 "open,high,low,close,volume,amount"。
+
+**config** STRING 类型标量，行情配置。如 "CPS:2" 表示前复权。详见 [字典参数常用配置](#5-字典参数常用配置)。
+
+**startDate** STRING 类型标量，格式为 "YYYY-MM-DD"。
+
+**endDate** STRING 类型标量，格式为 "YYYY-MM-DD"。
 
 **返回值**
 
@@ -184,7 +223,7 @@ tb = ifind::thsHistoryQuotes(accToken, "600519.SH,600518.SH", "open,high,low,clo
 **语法**
 
 ```dolphindb
-ifind::thsHighFrequency(token, codes, indicators, functionPara, startTime, endTime)
+ifind::thsHighFrequency(token, code, indicator, config, startTime, endTime)
 ```
 
 **详情**
@@ -193,12 +232,17 @@ ifind::thsHighFrequency(token, codes, indicators, functionPara, startTime, endTi
 
 **参数**
 
-- **token**：STRING 类型标量。
-- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
-- **indicators**：STRING 类型标量。
-- **functionPara**：STRING 类型标量。常用 `"Interval:1"`。详见 [字典参数常用配置](#5-字典参数常用配置)。
-- **startTime**：STRING 类型标量，格式为 `"YYYY-MM-DD HH:mm:ss"`。须含秒。
-- **endTime**：STRING 类型标量，格式为 `"YYYY-MM-DD HH:mm:ss"`。晚于 *startTime*。
+**token** STRING 类型标量。
+
+**code** STRING 类型标量，多个代码用半角逗号分隔。
+
+**indicator** STRING 类型标量。
+
+**config** STRING 类型标量。常用 "Interval:1"。详见 [字典参数常用配置](#5-字典参数常用配置)。
+
+**startTime** STRING 类型标量，格式为 "YYYY-MM-DD HH:mm:ss"。须含秒。
+
+**endTime** STRING 类型标量，格式为 "YYYY-MM-DD HH:mm:ss"。晚于 startTime。
 
 **返回值**
 
@@ -226,7 +270,7 @@ tb = ifind::thsHighFrequency(accToken, "600519.SH,600518.SH", "open,high,low,clo
 **语法**
 
 ```dolphindb
-ifind::thsRealTime(token, codes, indicators)
+ifind::thsRealTime(token, code, indicator)
 ```
 
 **详情**
@@ -235,9 +279,11 @@ ifind::thsRealTime(token, codes, indicators)
 
 **参数**
 
-- **token**：STRING 类型标量。
-- **codes**：STRING 类型标量，多个代码用半角逗号分隔。
-- **indicators**：STRING 类型标量。
+**token** STRING 类型标量。
+
+**code** STRING 类型标量，多个代码用半角逗号分隔。
+
+**indicator** STRING 类型标量。
 
 **返回值**
 
@@ -272,7 +318,7 @@ ifind::getAccessToken(refreshToken)
 
 **参数**
 
-- **refreshToken**：STRING 类型标量，登录同花顺 iFinD 超级命令通过相应工具获取的长效凭证。
+**refreshToken** STRING 类型标量，登录同花顺 iFinD 超级命令通过相应工具获取的长效凭证。
 
 **返回值**
 
@@ -297,10 +343,10 @@ ifind::getAccessToken(refreshToken)
 
 模块内部会对输入进行前置过滤，不合法的输入会直接触发异常提示而不消耗 API 流量：
 
-- **格式校验**: *startDate* 必须符合 `"YYYY-MM-DD"`；*startTime* 必须符合 `"YYYY-MM-DD HH:mm:ss"`。
-- **类型校验**: 所有参数必须为 `STRING scalar`。
-- **报错效果**:
-  - `codes must be a STRING scalar`
+- **格式校验**：startDate 必须符合 "YYYY-MM-DD"；startTime 必须符合 "YYYY-MM-DD HH:mm:ss"。
+- **类型校验**：所有参数必须为 STRING scalar。
+- **报错效果**：
+  - `code must be a STRING scalar`
   - `startDate must follow 'YYYY-MM-DD'`
 
 ### 6.2 dataVol 监控
@@ -326,7 +372,7 @@ submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
 
 ### 7.2 批量化请求
 
-尽可能在一个 *codes* 字符串中包含多个代码（用逗号分隔）。一次请求多个股票的性能远高于单只股票重复请求。
+尽可能在一个 code 字符串中包含多个代码（用逗号分隔）。一次请求多个股票的性能远高于单只股票重复请求。
 
 ---
 
@@ -341,4 +387,4 @@ submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
 
 ---
 
-*Last modified: 2026-03-13 (v1.1.8)*
+*Last modified: 2026-03-18 (v1.1.9)*
