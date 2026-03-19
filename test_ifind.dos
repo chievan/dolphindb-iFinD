@@ -455,8 +455,8 @@ ifind::thsBasicData(accToken, "600519.SH", "ths_wrong_indicator_abc")
 // 格式正确，但参数 Key 或内容无效，能返回空值
 @testing:case = "test_thsBasicData_invalid_indipara"
 res_basic_invalid_indipara = ifind::thsBasicData(accToken, "600519.SH", "ths_roe_stock", "invalid_key:value")
-assert 701, isNull(res_basic_invalid_indipara) or res_basic_invalid_indipara.rows() >= 0
-if(!isNull(res_basic_invalid_indipara) and res_basic_invalid_indipara.rows() > 0){
+assert 701, isNull(res_basic_invalid_indipara.ths_roe_stock) or res_basic_invalid_indipara.rows() >= 0
+if(!isNull(res_basic_invalid_indipara.ths_roe_stock) and res_basic_invalid_indipara.rows() > 0){
     cols = res_basic_invalid_indipara.values()
     nullAll = true
     for(i in 1:(size(cols)-1)){
@@ -469,20 +469,23 @@ if(!isNull(res_basic_invalid_indipara) and res_basic_invalid_indipara.rows() > 0
 
 // --- 3.2 thsDateSequence 内容反向 ---
 
-@testing:case = "test_thsDateSequence_invalid_interval", exception=1
+@testing:case = "test_thsDateSequence_invalid_interval"
 // Interval 取值非法 (应为 D/W/M/Q/S/Y)
-ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:Z", 2024.01.01, 2024.02.01)
+re = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "Interval:Z", 2024.01.01, 2024.02.01)
+assert 1, re.size() > 0
 
-@testing:case = "test_thsDateSequence_future_date", exception=1
+@testing:case = "test_thsDateSequence_future_date"
 // 查询未来日期的数据，thsDateSequence 默认返回最后一天数据
-ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", 2030.01.01, 2030.01.10)
+re = ifind::thsDateSequence(accToken, "600519.SH", "ths_pe_ttm_stock", "", "", 2030.01.01, 2030.01.10)
+assert 1, re.size() > 0
 
 
 // --- 3.3 thsHistoryQuotes 内容反向 ---
 
-@testing:case = "test_thsHistoryQuotes_invalid_cps", exception=1
+@testing:case = "test_thsHistoryQuotes_invalid_cps"
 // 复权方式 (CPS) 为无效数字，选填参数不影响结果，返回默认结果
-ifind::thsHistoryQuotes(accToken, "600519.SH", "close", "CPS:99", 2024.01.01, 2024.02.01)
+re = ifind::thsHistoryQuotes(accToken, "600519.SH", "close", "CPS:99", 2024.01.01, 2024.02.01)
+assert 1, re.size() > 0
 
 @testing:case = "test_thsHistoryQuotes_not_listed_date", exception=1
 // 查询股票没有数据的区间日期，会报错
@@ -523,16 +526,16 @@ ifind::thsRealTime(accToken, "INVALID.TICKER", "latest")
 @testing:case = "test_thsRealTime_mixed_codes"
 // 混合了正确和明显错误的代码 (取决于 API 是部分返回还是整体报错),部分返回
 res_rt_mixed_codes = ifind::thsRealTime(accToken, "600519.SH,INVALID.TICKER", "latest")
-assert 703, !isNull(res_rt_mixed_codes)
+assert 703, !isNull(res_rt_mixed_codes.values())
 assert 704, res_rt_mixed_codes.rows() >= 1
-assert 705, any(res_rt_mixed_codes.ths_code == "600519.SH")
+assert 705, any(res_rt_mixed_codes.thscode == "600519.SH")
 
 @testing:case = "test_thsRealTime_error_ind"
 // 混合了正确和明显错误的指标 (取决于 API 是部分返回还是整体报错)，部分返回
 res_rt_error_ind = ifind::thsRealTime(accToken, "600519.SH", "close,hh_cc")
-assert 706, !isNull(res_rt_error_ind)
+assert 706, !isNull(res_rt_error_ind.values())
 assert 707, res_rt_error_ind.rows() >= 1
-assert 708, any(res_rt_error_ind.ths_code == "600519.SH")
+assert 708, any(res_rt_error_ind.thscode == "600519.SH")
 
 @testing:case = "test_thsRealTime_invalid_indicators", exception=1
 // 输入明显的错误指标，会直接报错
