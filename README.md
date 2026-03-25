@@ -20,6 +20,7 @@
 本模块依赖 DolphinDB 官方的 `httpClient` 网络插件。
 
 注意：在使用本模块前请按照 [httpClient 插件说明](https://docs.dolphindb.cn/zh/plugins/httpClient/httpclient.html)进行安装。例如可执行下列命令安装、加载，或在节点配置文件中配置  `preloadModules=plugins::httpClient`：
+
 ```
 installPlugin("httpClient");
 loadPlugin("httpClient");
@@ -28,6 +29,7 @@ loadPlugin("httpClient");
 ### 2.2 安装模块
 
 #### 版本要求
+
 - 支持 DolphinDB Server 2.00.17 及以上版本。
 - 支持 Linux x64，Linux ARM ，Linux ABI，Windows x64。
 
@@ -51,13 +53,15 @@ loadPlugin("httpClient");
    ```
    use iFinD
    ```
+
 ### 2.3 凭证获取
 
 要使用 iFinD 数据服务，您需要首先在同花顺 iFinD 终端获取长效凭证，并通过模块置换为访问令牌：
 
 1. **获取 Refresh Token**：
 
-   - 登录 **同花顺 超级命令SuperCommand**。
+   - 登录 **同花顺 超级命令SuperCommand，**
+   - 或登录网页版超级命令，[https://quantapi.10jqka.com.cn/gwstatic/static/ds_web/super-command-web/index.html](https://quantapi.10jqka.com.cn/gwstatic/static/ds_web/super-command-web/index.html)（同样可以用于指标和参数的查询），
    - 在工具中点击“`refresh_token`查询”，然后复制即可（通常是以 `eyJ` 开头的长字符串）。
 2. **获取 Access Token**：
 
@@ -304,6 +308,130 @@ tb = iFinD::thsRealTime(accToken, "600519.SH,601318.SH", "latest")
 
 ---
 
+### thsEDB
+
+经济数据库：获取宏观经济、行业经济等数据。
+
+**语法**
+
+```dolphindb
+iFinD::thsEDB(token, indicators, functionPara, startDate, endDate)
+```
+
+**详情**
+
+用于提取宏观、中观经济指标。支持通过 `functionPara` 字典控制数据呈现模式（如 `mode:id`）。
+
+**参数**
+
+**token** STRING 类型标量。
+
+**indicators** STRING 类型标量，指标 ID。示例: "L001619604"。
+
+**functionPara** STRING 或 DICTIONARY，功能参数。
+
+**startDate / endDate** DATE 类型标量。
+
+**示例**
+
+```dolphindb
+fucPara = dict(STRING, ANY); fucPara["mode"] = "id"
+res = iFinD::thsEDB(accToken, "L001619604", fucPara, 2024.01.01, 2024.01.05)
+```
+
+**返回样例**
+
+| id         | index_name              | time       | value  | rtime               |
+| :--------- | :---------------------- | :--------- | :----- | :------------------ |
+| L001619604 | 中债国债到期收益率:10年 | 2024.01.05 | 2.5175 | 2024-01-05 00:00:00 |
+| L001619604 | 中债国债到期收益率:10年 | 2024.01.04 | 2.5368 | 2024-01-04 00:00:00 |
+| L001619604 | 中债国债到期收益率:10年 | 2024.01.03 | 2.5531 | 2024-01-03 00:00:00 |
+| L001619604 | 中债国债到期收益率:10年 | 2024.01.02 | 2.5601 | 2024-01-02 00:00:00 |
+
+---
+
+### thsDataPool
+
+数据池：获取板块成份、成分股权重、期货活跃合约等各类报表数据。
+
+**语法**
+
+```dolphindb
+iFinD::thsDataPool(token, reportName, functionPara, outputPara)
+```
+
+**详情**
+
+基于报表引擎的万能接口，支持通过 `reportName` 指定报表 ID，并通过 `outputPara` 定义输出列。
+
+**参数**
+
+**token** STRING 类型标量。
+
+**reportName** STRING 类型标量，如 "p03291" (板块成份)。
+
+**functionPara** STRING 或 DICTIONARY，过滤条件。如 "date:20240320,blockname:001031"。
+
+**outputPara** STRING 类型标量，输出字段，如 "p03291_f001,p03291_f002"。
+
+**示例**
+
+```dolphindb
+res = iFinD::thsDataPool(accToken, "p03291", "date:20240320,blockname:001031", "p03291_f001,p03291_f002")
+```
+
+**返回样例**
+
+| p03291_f002 | p03291_f001 |
+| :---------- | :---------- |
+| 000001.SZ   | 2024/03/20  |
+| 000002.SZ   | 2024/03/20  |
+| 000004.SZ   | 2024/03/20  |
+| 000005.SZ   | 2024/03/20  |
+| 000006.SZ   | 2024/03/20  |
+
+---
+
+### thsSnapShot
+
+日内快照：获取指定证券在特定时间段内的行情快照信息（由 startTime 和 endTime 定义范围）。
+
+**语法**
+
+```dolphindb
+iFinD::thsSnapShot(token, code, indicator, startTime, endTime)
+```
+
+**详情**
+
+提供高维度的日内分笔/快照数据，支持混合大小写指标（如 `avgBuyPrice`）。
+
+**参数**
+
+**token** STRING 类型标量。
+
+**code** STRING 类型标量，多个代码用半角逗号分隔。
+
+**indicator** STRING 类型标量，支持混合大小样式指标。
+
+**startTime / endTime** DATETIME 类型标量，或符合格式的字符串。
+
+**示例**
+
+```dolphindb
+tb = iFinD::thsSnapShot(accToken, "600519.SH", "latest,avgBuyPrice", 2026.03.24T09:30:00, 2026.03.24T09:35:00)
+```
+
+**返回样例**
+
+| thscode   | time                | latest | avgBuyPrice |
+| :-------- | :------------------ | :----- | :---------- |
+| 600519.SH | 2026-03-24 09:30:02 | 1416   | 1383.814    |
+| 600519.SH | 2026-03-24 09:30:05 | 1416   | 1382.411    |
+| 600519.SH | 2026-03-24 09:30:08 | 1416   | 1381.907    |
+
+---
+
 ## 4. 管理与辅助函数
 
 ### getAccessToken
@@ -387,4 +515,4 @@ submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
 
 ---
 
-*Last modified: 2026-03-18 (v1.1.9)*
+*Last modified: 2026-03-25 (v1.2.0)*

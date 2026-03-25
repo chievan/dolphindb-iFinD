@@ -39,10 +39,6 @@ assert 2, res1_3.count() == 2
 res1_4 = iFinD::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_stock,ths_roe_avg_by_ths_stock", ";2022-12-31;2023-12-31")
 assert 3, eqObj(res1_4.columnNames() , ["thscode","ths_stock_short_name_stock","ths_roe_stock","ths_roe_avg_by_ths_stock"])==true
 assert 4, res1_4.count() == 2
-//大写指标自动转小写 (模块内部调用 lower() 纠正)
-res1_5 = iFinD::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_STOCK", ";2023-12-31")
-assert 5, eqObj(res1_5.columnNames() , ["thscode","ths_stock_short_name_stock","ths_roe_stock"])==true
-assert 6, res1_5.count() == 2
 //indicatorPara 日期格式兼容: YYYY-MM-DD 与 YYYYMMDD
 res1_6 = iFinD::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_STOCK", ";20231231")
 assert 7, res1_6.count() == 2
@@ -167,11 +163,53 @@ print("\n=== 测试 thsRealTime (实时行情) ===")
 // 多标的 + 多指标实时快照
 expectedCols5 = ["thscode", "latest", "bid1", "ask1"]
 res5_1 = iFinD::thsRealTime(accToken, "600519.SH,000001.SZ", "latest,bid1,ask1")
-assert 1, res5_1.rows() > 0
-assert 2, all(expectedCols5 in res5_1.columnNames())
-assert 3, res5_1.rows() == 2   // 两个标的各一行
+assert 21, res5_1.rows() > 0
+assert 22, all(expectedCols5 in res5_1.columnNames())
+assert 23, res5_1.rows() == 2   // 两个标的各一行
 
-// --- 1.6 并发执行测试 (Concurrency Tests) ---
+// --- 1.6 thsEDB (经济数据库) ---
+print("\n=== 测试 thsEDB (经济数据库) ===")
+@testing:case = "test_thsEDB_Standard"
+// 获取中债国债收益率 10年 (L001619604) 和 5年 (L001618299)
+ind_edb = "L001619604,L001618299"
+res_edb = iFinD::thsEDB(accToken, ind_edb, NULL, 2024.01.01, 2024.01.05)
+assert 24, res_edb.rows() > 0
+assert 25, any(res_edb.columnNames() == "value")
+
+@testing:case = "test_thsEDB_ChinaEconomy"
+// 测试通过字典参数传递 mode:id
+indList = "M005959455,M001625518,M002043802,M003786491"
+fucPara = dict(STRING, ANY); fucPara["mode"] = "id"
+resEdb2 = iFinD::thsEDB(accToken, indList, fucPara, 2025.03.24, 2026.03.24)
+assert 26, resEdb2.rows() > 0
+
+// --- 1.7 thsDataPool (数据池) ---
+print("\n=== 测试 thsDataPool (数据池报表) ===")
+@testing:case = "test_thsDataPool_CSI500"
+/* 场景 A: 中证500 (001031) 成份股抓取 */
+res_csi = iFinD::thsDataPool(accToken, "p03291", "date:20240320,blockname:001031", "p03291_f001,p03291_f002")
+assert 27, res_csi.rows() > 0
+@testing:case = "test_thsDataPool_Futures"
+/* 场景 B: 期货板块活跃合约 (091004004) */
+f_para = dict(STRING, ANY)
+f_para["date"] = "20260324"; f_para["blockname"] = "091004004"; f_para["iv_type"] = "monthcontract"
+res_pool = iFinD::thsDataPool(accToken, "p03291", f_para, "p03291_f001,p03291_f002,p03291_f003")
+assert 28, res_pool.rows() > 0
+@testing:case = "test_thsDataPool_BlockSearch"
+/* 场景 C: 板块 ID 检索 (p03321) */
+res_bkid = iFinD::thsDataPool(accToken, "p03321", "iv_bkid:091", "p03321_f001,p03321_f002,p03321_f003")
+assert 29, res_bkid.rows() > 0
+
+// --- 1.8 thsSnapShot (日内快照) ---
+print("\n=== 测试 thsSnapShot (日内快照) ===")
+@testing:case = "test_thsSnapShot_Basic"
+ind_ss = "latest,preClose,avgBuyPrice"
+t1 = 2026.03.24T09:30:00; t2 = 2026.03.24T09:32:00
+res_ss = iFinD::thsSnapShot(accToken, "600519.SH", ind_ss, t1, t2)
+assert 30, res_ss.rows() > 0
+assert 31, "avgBuyPrice" in res_ss.columnNames()
+
+// --- 1.9 并发执行测试 (Concurrency Tests) ---
 @testing:case = "test_Concurrent_thsBasicData"
 print("\n=== 并发测试 thsBasicData ===")
 def concurrentBasicData(tk, codes, ind) {
@@ -266,6 +304,22 @@ for (i in 1..2) {
     jobs_rt.append!(jobId)
 }
 for (jid in jobs_rt) { res = getJobReturn(jid, true); assert 605, res == 3 }
+
+@testing:case = "test_Concurrent_ExtraInterfaces"
+print("\n=== 并发压力测试 (EDB/Pool/Snap) ===")
+def extraStressTask(tk, type) {
+    if (type == "edb")  return iFinD::thsEDB(tk, "L001619604", NULL, 2024.01.01, 2024.01.02).rows()
+    if (type == "pool") return iFinD::thsDataPool(tk, "p03291", "date:20260324,blockname:091004004", "p03291_f001").rows()
+    if (type == "snap") return iFinD::thsSnapShot(tk, "600519.SH", "latest", 2026.03.24T09:30:00, 2026.03.24T09:30:10).rows()
+    return 0
+}
+jobIds_ext = array(STRING, 0); types = ["edb", "pool", "snap"]
+for (i in 1..3) {
+    jid = "stress_extra_job_" + string(i)
+    submitJob(jid, "ExtraStress", extraStressTask, accToken, types[i-1])
+    jobIds_ext.append!(jid)
+}
+for (jid in jobIds_ext) { assert 606, getJobReturn(jid, true) >= 0 }
 
 // ====================================================
 // 第二部分：系统化异常校验 (Systematic Exception Tests)
@@ -412,7 +466,27 @@ iFinD::thsRealTime(accToken, string(NULL), "latest")
 @testing:case = "test_thsRealTime_indicators_form", exception=1
 iFinD::thsRealTime(accToken, "600519.SH", ["latest", "amount"])
 
-// --- 2.6 getAccessToken 异常校验 ---
+// --- 2.6 thsEDB 异常校验 ---
+@testing:case = "test_EDB_Token_Null", exception=1
+iFinD::thsEDB(NULL, "L001", NULL, 2024.01.01, 2024.12.31)
+@testing:case = "test_EDB_Indicators_Null", exception=1
+iFinD::thsEDB(accToken, NULL, NULL, 2024.01.01, 2024.12.31)
+@testing:case = "test_EDB_StartDate_Type", exception=1
+iFinD::thsEDB(accToken, "L001", NULL, "2024-01-01", 2024.12.31)
+
+// --- 2.7 thsDataPool 异常校验 ---
+@testing:case = "test_Pool_Report_Null", exception=1
+iFinD::thsDataPool(accToken, NULL, "", "f1")
+@testing:case = "test_Pool_Output_Type", exception=1
+iFinD::thsDataPool(accToken, "p03291", "", 123)
+
+// --- 2.8 thsSnapShot 异常校验 ---
+@testing:case = "test_Snap_Ind_Empty", exception=1
+iFinD::thsSnapShot(accToken, "600519.SH", "", 2024.01.01T00:00:00, 2024.01.01T01:00:00)
+@testing:case = "test_Snap_Time_Order", exception=1
+iFinD::thsSnapShot(accToken, "600519.SH", "latest", 2026.03.24T15:00:00, 2026.03.24T09:00:00)
+
+// --- 2.9 getAccessToken 异常校验 ---
 
 @testing:case = "test_getAccessToken_arg_count_less", exception=1
 iFinD::getAccessToken()
@@ -451,6 +525,12 @@ iFinD::thsBasicData(accToken, "999999.ZZ", "ths_stock_short_name_stock")
 @testing:case = "test_thsBasicData_invalid_indicators", exception=1
 // 格式正确，但指标名错误
 iFinD::thsBasicData(accToken, "600519.SH", "ths_wrong_indicator_abc")
+
+@testing:case = "test_thsBasicData_case_sensitive_indicators"
+// 指标需要严格区分大小写
+res1_3_1 = iFinD::thsBasicData(accToken, "000001.SZ,600030.SH", "ths_stock_short_name_stock,ths_roe_STOCK", ";2023-12-31")
+assert 301, !("ths_roe_STOCK" in res1_3_1.columnNames()) and !("ths_roe_stock" in res1_3_1.columnNames())
+assert 302, res1_3_1.count() == 2
 
 // 格式正确，但参数 Key 或内容无效，能返回空值
 @testing:case = "test_thsBasicData_invalid_indipara"
@@ -540,6 +620,39 @@ assert 708, any(res_rt_error_ind.thscode == "600519.SH")
 @testing:case = "test_thsRealTime_invalid_indicators", exception=1
 // 输入明显的错误指标，会直接报错
 iFinD::thsRealTime(accToken, "600519.SH", "hh_cc")
+
+// --- 3.6 鉴权反向 ---
+@testing:case = "test_Reverse_InvalidToken", exception=1
+// 格式正确但无法通过 iFinD 校验的 Token
+iFinD::thsRealTime("INVALID_TOKEN_FORMAT_BUT_STRING_TYPE", "600519.SH", "latest")
+
+// --- 3.7 thsEDB 业务反向 ---
+@testing:case = "test_EDB_WrongID", exception=1
+iFinD::thsEDB(accToken, "IND_NOT_EXIST", NULL, 2024.01.01, 2024.01.05)
+@testing:case = "test_EDB_TimeReversed", exception=1
+iFinD::thsEDB(accToken, "L001619604", NULL, 2024.12.31, 2024.01.01)
+
+// --- 3.8 thsDataPool 业务反向 ---
+@testing:case = "test_Pool_WrongReport", exception=1
+iFinD::thsDataPool(accToken, "p_error_999", "", "f1")
+@testing:case = "test_Pool_InvalidField", exception=1
+// 报表存在，但输出字段非法项
+res_pool_invalid_field = iFinD::thsDataPool(accToken, "p03291", "date:20240320,blockname:001031", "thscode,non_exist_field")
+assert 709, res_pool_invalid_field.rows() >= 1
+@testing:case = "test_Pool_BadFuncPara" , exception=1
+// 功能参数 Key 错误（部分 API 会忽略非法参数返回默认结果或报错）
+iFinD::thsDataPool(accToken, "p03291", "wrong_key:123", "p03291_f001")
+
+// --- 3.9 thsSnapShot 业务反向 ---
+@testing:case = "test_Snap_InvalidCodes", exception=1
+iFinD::thsSnapShot(accToken, "999999.ZZ", "latest", 2026.03.24T09:30:00, 2026.03.24T09:35:00)
+@testing:case = "test_Snap_InvalidInd", exception=1
+iFinD::thsSnapShot(accToken, "600519.SH", "wrong_indicator_name", 2026.03.24T09:30:00, 2026.03.24T09:35:00)
+@testing:case = "test_Snap_FutureTime", exception=1
+// 查询极远未来的时间快照 (dataVol=0)
+iFinD::thsSnapShot(accToken, "600519.SH", "latest", 2126.03.24T09:30:00, 2126.03.24T09:35:00)
+@testing:case = "test_Snap_TimeReversed", exception=1
+iFinD::thsSnapShot(accToken, "600519.SH", "latest", 2026.03.24T15:00:00, 2026.03.24T09:00:00)
 
 // ====================================================
 // 第四部分：依赖校验 (Dependency Validation)
