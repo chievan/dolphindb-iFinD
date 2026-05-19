@@ -515,4 +515,14 @@ submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
 
 ---
 
-*Last modified: 2026-03-25 (v1.2.0)*
+## 9. 版本更新说明 (Changelog)
+
+### v1.2.1
+- **修复 `indiparams` 解析在低版本 DolphinDB (3.00.4) 下丢失的问题**：
+  - **根因**：原代码对字典成员数组使用了原地修改操作（`item["indiparams"].append!(sp)`）。DolphinDB 3.00.5 兼容此用法，但在 3.00.4 中对 dictionary / tuple 的 in-place 操作兼容性较差，表现为 `indiparams` 最后仍是空数组。
+  - **修复原则**：不直接对 `dict` 成员做 `append!`，改为**先构造临时数组，再整体赋值给** `item["indiparams"]`，以此保证多版本兼容。
+- **增强向下兼容性**：统一使用 DolphinDB 2.00.18 环境执行 `encryptModule` 进行模块加密，确保生成的加密模块能够兼容低版本及高版本 DolphinDB 环境。
+
+---
+
+*Last modified: 2026-05-19 (v1.2.1)*
