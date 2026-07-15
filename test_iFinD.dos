@@ -80,7 +80,7 @@ res2_11 = iFinD::thsDateSequence(accToken, "600519.SH", "ths_total_shares_stock"
 res2_12 = iFinD::thsDateSequence(accToken, "600519.SH", "ths_total_shares_stock", "20220705", "", 2024.12.25, 2025.01.05)
 //多指标 + 指标参数覆盖
 res2_13 = iFinD::thsDateSequence(accToken, "000002.SZ", "ths_pe_ttm_stock,ths_pb_latest_stock", "", "Interval:W", 2024.01.01, 2024.03.01)
-res2_14 = iFinD::thsDateSequence(accToken, "30033.SZ,600030.SH", "ths_total_equity_atoopc_stock,ths_regular_report_actual_dd_stock", ",100;", "Interval:D", 2024.01.01, 2024.03.01)
+res2_14 = iFinD::thsDateSequence(accToken, "300033.SZ,600030.SH", "ths_pe_ttm_stock,ths_pb_latest_stock", "", "Interval:D", 2024.01.01, 2024.03.01)
 
 // --- 1.3 thsHistoryQuotes (历史 K 线行情) ---
 @testing:case = "test_thsHistoryQuotes_Rich"

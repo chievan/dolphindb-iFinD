@@ -523,6 +523,13 @@ submitJob("job1", "IFIND", parallelLoad, accToken, "600519.SH")
   - **修复原则**：不直接对 `dict` 成员做 `append!`，改为**先构造临时数组，再整体赋值给** `item["indiparams"]`，以此保证多版本兼容。
 - **增强向下兼容性**：统一使用 DolphinDB 2.00.18 环境执行 `encryptModule` 进行模块加密，确保生成的加密模块能够兼容低版本及高版本 DolphinDB 环境。
 
+### v1.2.2
+- **修复 `thsEDB` 在 DolphinDB 3.00.6 下 `time` 与 `rtime` 字段返回为空的问题**：
+  - **根因**：DolphinDB 3.00.6 的 `fromStdJson` 会将 JSON 中的 `time`、`rtime` 字符串自动识别为 `DATE` / `DATETIME` 类型，而 3.00.4 / 3.00.5 中保留为 `STRING` 类型。原 `extractEdbTable` 默认按 `STRING` 处理并使用 `temporalParse` 按 `"yyyy-MM-dd"` 格式解析，新版本传入已是 `DATE` / `DATETIME` 后格式不匹配，导致整列返回 NULL。
+  - **修复方案**：使用 `typestr()` 配合 `like` 模糊匹配，兼容 `STRING` / `DATE` / `DATETIME` / `TIMESTAMP` / `DATEHOUR` / `NANOTIMESTAMP` 等多种时间类型，并按类型分支处理（保留、`date()` 取日期、`timestamp()` 转换或 `temporalParse` 解析）。
+- **调整 `rtime` 字段返回类型为 `DATETIME`**：避免显式 `timestamp()` 转换后出现 `.000` 毫秒后缀，与原版显示效果保持一致。
+- **兼容性**：同时兼容 DolphinDB 3.00.4 / 3.00.5 / 3.00.6 三个版本。
+
 ---
 
-*Last modified: 2026-05-19 (v1.2.1)*
+*Last modified: 2026-07-15 (v1.2.2)*
